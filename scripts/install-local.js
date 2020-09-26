@@ -85,10 +85,9 @@ for (let pkg of packages) {
 console.log('sample app');
 fsExtra.writeFileSync('package.json', JSON.stringify(packageJson, null, 4));
 console.log('ropm install');
-childProcess.execSync('ropm install', {
+childProcess.execSync('npx ropm install', {
   stdio: 'inherit'
 });
-
 
 function printHeader(name) {
   var length = 80;
