@@ -1,6 +1,6 @@
 {
   "name": "maestro-roku-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A development platform for building roku channels in brighterscript. Core Library",
   "directories": {
     "doc": "docs"
@@ -9,10 +9,10 @@
     "dist/**/!(manifest)*"
   ],
   "dependencies": {
-    "log": "file:../maestro-roku-log",
-    "mc": "file:../maestro-roku-core",
-    "mv": "file:../maestro-roku-view",
-    "mioc": "file:../maestro-roku-ioc"
+    "log": "maestro-roku-log",
+    "mc": "maestro-roku-core",
+    "mv": "maestro-roku-view",
+    "mioc": "maestro-roku-ioc"
   },
   "devDependencies": {
     "fs-extra": "^5.0.0",
@@ -22,8 +22,6 @@
     "ts-node": "^8.1.0",
     "@types/fs-extra": "^8.0.0",
     "brighterscript": "^0.15.0",
-    "brightscript-language": "^0.2.15",
-    "burp-brightscript": "^0.3.2",
     "del": "^3.0.0",
     "docdash": "^0.4.0",
     "gulp": "^4.0.1",

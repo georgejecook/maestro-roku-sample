@@ -35,6 +35,9 @@ export async function compile(cb) {
   // await builder.run(config);
   await builder.run({});
   fs.removeSync(path.join('dist', 'manifest'));
+  fs.removeSync(path.join('dist', 'source', 'roku_modules'));
+  fs.removeSync(path.join('dist', 'components', 'roku_modules'));
+
   // this will move to a ropm module; until then we need our own bslib copies
   // fs.removeSync(path.join('dist', 'source', 'bslib.brs'));
 }

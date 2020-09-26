@@ -10,11 +10,11 @@ var chalk = require('chalk');
 var argv = require('yargs').argv;
 
 let packages = [
-  'maestro-roku-log',
-  'maestro-roku-core',
-  'maestro-roku-ioc',
-  'maestro-roku-view',
-  'maestro-roku-mvvm',
+  { prefix: 'log', name: 'maestro-roku-log' },
+  { prefix: 'mc', name: 'maestro-roku-core' },
+  { prefix: 'mioc', name: 'maestro-roku-ioc' },
+  { prefix: 'mv', name: 'maestro-roku-view' },
+  { prefix: 'mx', name: 'maestro-roku-mvvm' },
 ];
 
 //set the cwd to the root of this project
@@ -22,21 +22,21 @@ let thisProjectRootPath = path.join(__dirname, '..');
 process.chdir(thisProjectRootPath);
 let packageJson = JSON.parse(fsExtra.readFileSync('package.json').toString());
 
-for (let packageName of packages) {
-  printHeader(packageName);
-  let packageSrcPath = path.resolve(path.join('..', packageName));
+for (let pkg of packages) {
+  printHeader(pkg.name);
+  let packageSrcPath = path.resolve(path.join('..', pkg.name));
 
   //if the project doesn't exist, clone it from github
   if (!fsExtra.pathExistsSync(packageSrcPath)) {
-    console.log(`Cloning '${packageName}' from github`);
+    console.log(`Cloning '${pkg.name}' from github`);
     //clone the project
-    childProcess.execSync(`git clone https://github.com/georgejecook/${packageName}`, {
+    childProcess.execSync(`git clone https://github.com/georgejecook/${pkg.name}`, {
       cwd: path.resolve('..'),
       stdio: 'inherit'
     });
     //if --pull was provided, fetch and pull latest for each repo
   } else if (argv.pull === true) {
-    console.log(`'${packageName}' exists. Getting latest`);
+    console.log(`'${pkg.name}' exists. Getting latest`);
 
     childProcess.execSync(`git fetch && git pull`, {
       cwd: packageSrcPath,
@@ -45,47 +45,49 @@ for (let packageName of packages) {
   }
 
   //install all npm dependencies 
-  console.log(`Installing npm packages for '${packageName}'`);
+  console.log(`Installing npm packages for '${pkg.name}'`);
   try {
     childProcess.execSync(`npm install`, {
-      cwd: path.resolve('..', packageName),
+      cwd: path.resolve('..', pkg.name),
       stdio: 'inherit'
     });
   } catch (e) {
     console.error(e);
   }
 
-  console.log(`bulding '${packageName}'`);
+  console.log(`bulding '${pkg.name}'`);
   //build the project
   try {
+    childProcess.execSync(`ropm install`, {
+      cwd: path.resolve('..', pkg.name),
+      stdio: 'inherit'
+    });
     childProcess.execSync(`npm run build`, {
-      cwd: path.resolve('..', packageName),
+      cwd: path.resolve('..', pkg.name),
       stdio: 'inherit'
     });
   } catch (e) {
     console.error(e);
   }
 
-  console.log(`deleting '${packageName}' from node_modules to prevent contention`);
+  console.log(`deleting '${pkg.name}' from node_modules to prevent contention`);
   try {
-    fsExtra.ensureDirSync(`node_modules/${packageName}`);
-    fsExtra.removeSync(`node_modules/${packageName}`);
+    fsExtra.ensureDirSync(`node_modules/${pkg.name}`);
+    fsExtra.removeSync(`node_modules/${pkg.name}`);
   } catch (e) {
     console.error(e);
   }
 
-  console.log(`adding '../${packageName}' to package.json`);
-  packageJson.dependencies[packageName] = `file:../${packageName}`;
+  console.log(`adding '../${pkg.name}' to package.json with prefix ${pkg.prefix}`);
+  packageJson.dependencies[pkg.prefix] = `file:../${pkg.name}`;
 }
 
-printHeader('vscode-brightscript-language');
-console.log('saving package.json changes');
+console.log('sample app');
 fsExtra.writeFileSync('package.json', JSON.stringify(packageJson, null, 4));
-console.log('npm install');
-childProcess.execSync('npm install', {
+console.log('ropm install');
+childProcess.execSync('ropm install', {
   stdio: 'inherit'
 });
-
 
 
 function printHeader(name) {

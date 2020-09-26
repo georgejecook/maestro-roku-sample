@@ -13,3 +13,15 @@ A development platform for building roku channels in brighterscript. View librar
  - **[Documentation](docs/index.md)**
  - **[API docs](https://georgejecook.github.io/maestro-roku-sample)**
  - \#maestro channel on the [roku developer's slack](https://join.slack.com/t/rokudevelopers/shared_invite/enQtMzgyODg0ODY0NDM5LTc2ZDdhZWI2MDBmYjcwYTk5MmE1MTYwMTA2NGVjZmJiNWM4ZWY2MjY1MDY0MmViNmQ1ZWRmMWUzYTVhNzJiY2M)
+
+## Get started
+
+ - Clone this repo
+ - `npm install --only=dev`
+ - `ropm install`
+ - `npm run build`
+
+## Working on parts of maestro
+ - Follow instructions for get started
+ - `npm run install-local`
+ - `npm run build`
