@@ -1,4 +1,4 @@
-var fs = require('fs');
+var fs = require('fs-extra');
 var childProcess = require('child_process');
 
 let packages = [
