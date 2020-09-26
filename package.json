@@ -1,6 +1,6 @@
 {
   "name": "maestro-roku-core",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A development platform for building roku channels in brighterscript. Core Library",
   "directories": {
     "doc": "docs"
