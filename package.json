@@ -10,9 +10,10 @@
   ],
   "dependencies": {
     "log": "maestro-roku-log",
+    "maestro-roku-log": "^0.2.2",
     "mc": "maestro-roku-core",
-    "mv": "maestro-roku-view",
-    "mioc": "maestro-roku-ioc"
+    "mioc": "maestro-roku-ioc",
+    "mv": "maestro-roku-view"
   },
   "devDependencies": {
     "brighterscript": "^0.15.0",
