@@ -47,7 +47,7 @@ for (let pkg of packages) {
   //install all npm dependencies 
   console.log(`Installing npm packages for '${pkg.name}'`);
   try {
-    childProcess.execSync(`npm install`, {
+    childProcess.execSync(`npm install --only=dev`, {
       cwd: path.resolve('..', pkg.name),
       stdio: 'inherit'
     });
@@ -55,7 +55,7 @@ for (let pkg of packages) {
     console.error(e);
   }
 
-  console.log(`bulding '${pkg.name}'`);
+  console.log(`building '${pkg.name}'`);
   //build the project
   try {
     childProcess.execSync(`ropm install`, {
