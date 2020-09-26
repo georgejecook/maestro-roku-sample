@@ -2,88 +2,94 @@
  * Installs a local version of all the rokucommunity dependent packages into this project
  */
 
-var fsExtra = require('fs-extra');
+var fs = require('fs-extra');
 var path = require('path');
 var childProcess = require('child_process');
 var chalk = require('chalk');
 
-var argv = require('yargs').argv;
+// var argv = require('yargs').argv;
 
-let packages = [
-  { prefix: 'log', name: 'maestro-roku-log' },
-  { prefix: 'mc', name: 'maestro-roku-core' },
-  { prefix: 'mioc', name: 'maestro-roku-ioc' },
-  { prefix: 'mv', name: 'maestro-roku-view' },
-  { prefix: 'mx', name: 'maestro-roku-mvvm' },
-];
+let packages = {
+  'log': 'maestro-roku-log',
+  'mc': 'maestro-roku-core',
+  'mioc': 'maestro-roku-ioc',
+  'mv': 'maestro-roku-view',
+  'mx': 'maestro-roku-mvvm'
+};
 
 //set the cwd to the root of this project
 let thisProjectRootPath = path.join(__dirname, '..');
 process.chdir(thisProjectRootPath);
-let packageJson = JSON.parse(fsExtra.readFileSync('package.json').toString());
+let packageJson = JSON.parse(fs.readFileSync('package.json').toString());
 
-for (let pkg of packages) {
-  printHeader(pkg.name);
-  let packageSrcPath = path.resolve(path.join('..', pkg.name));
+for (let pkgPrefix in packages) {
+  const pkgName = packages[pkgPrefix]
+  printHeader(pkgName);
+  let packageSrcPath = path.resolve(path.join('..', pkgName));
 
   //if the project doesn't exist, clone it from github
-  if (!fsExtra.pathExistsSync(packageSrcPath)) {
-    console.log(`Cloning '${pkg.name}' from github`);
+  if (!fs.pathExistsSync(packageSrcPath)) {
+    console.log(`Cloning '${pkgName}' from github`);
     //clone the project
-    childProcess.execSync(`git clone https://github.com/georgejecook/${pkg.name}`, {
+    childProcess.execSync(`git clone https://github.com/georgejecook/${pkgName}`, {
       cwd: path.resolve('..'),
-      stdio: 'inherit'
-    });
-    //if --pull was provided, fetch and pull latest for each repo
-  } else if (argv.pull === true) {
-    console.log(`'${pkg.name}' exists. Getting latest`);
-
-    childProcess.execSync(`git fetch && git pull`, {
-      cwd: packageSrcPath,
       stdio: 'inherit'
     });
   }
 
   //install all npm dependencies 
-  console.log(`Installing npm packages for '${pkg.name}'`);
+  const subPkgPackagePath = path.join('..', pkgName, 'package.json');
+  console.log(`Updating project dependencies for '${pkgName}' in ${subPkgPackagePath}`);
+  let subPackageJson = JSON.parse(fs.readFileSync(subPkgPackagePath).toString());
+  for (let subPkgPrefix in subPackageJson.dependencies) {
+    if (packages[subPkgPrefix]) {
+      subPackageJson.dependencies[subPkgPrefix] = `file:../${packages[subPkgPrefix]}`;
+    }
+  }
+  fs.writeFileSync(subPkgPackagePath, JSON.stringify(subPackageJson, null, 4));
+
+  console.log(`adding '../${pkgName}' to package.json with pkgPrefix ${pkgPrefix}`);
+  packageJson.dependencies[pkgPrefix] = `file:../${pkgName}`;
+
+  console.log(`Installing npm packages for '${pkgName}'`);
   try {
     childProcess.execSync(`npm install --only=dev`, {
-      cwd: path.resolve('..', pkg.name),
+      cwd: path.resolve('..', pkgName),
       stdio: 'inherit'
     });
   } catch (e) {
     console.error(e);
   }
 
-  console.log(`building '${pkg.name}'`);
+  console.log(`building '${pkgName}'`);
   //build the project
   try {
     childProcess.execSync(`ropm install`, {
-      cwd: path.resolve('..', pkg.name),
+      cwd: path.resolve('..', pkgName),
       stdio: 'inherit'
     });
     childProcess.execSync(`npm run build`, {
-      cwd: path.resolve('..', pkg.name),
+      cwd: path.resolve('..', pkgName),
       stdio: 'inherit'
     });
   } catch (e) {
     console.error(e);
   }
 
-  console.log(`deleting '${pkg.name}' from node_modules to prevent contention`);
+  console.log(`deleting '${pkgName}' from node_modules to prevent contention`);
   try {
-    fsExtra.ensureDirSync(`node_modules/${pkg.name}`);
-    fsExtra.removeSync(`node_modules/${pkg.name}`);
+    fs.ensureDirSync(`node_modules/${pkgName}`);
+    fs.removeSync(`node_modules/${pkgName}`);
   } catch (e) {
     console.error(e);
   }
 
-  console.log(`adding '../${pkg.name}' to package.json with prefix ${pkg.prefix}`);
-  packageJson.dependencies[pkg.prefix] = `file:../${pkg.name}`;
+  console.log(`adding '../${pkgName}' to package.json with pkgPrefix ${pkgPrefix}`);
+  packageJson.dependencies[pkgPrefix] = `file:../${pkgName}`;
 }
 
 console.log('sample app');
-fsExtra.writeFileSync('package.json', JSON.stringify(packageJson, null, 4));
+fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 4));
 console.log('ropm install');
 childProcess.execSync('npx ropm install', {
   stdio: 'inherit'
