@@ -1,0 +1,228 @@
+import "pkg:/source/roku_modules/mv/ViewUtils.brs"
+import "pkg:/components/roku_modules/mv/mixin/FocusMixin.brs"
+import "pkg:/source/roku_modules/log/LogMixin.brs"
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ Initialization
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function Init()
+  log_registerLogger("AppController")
+
+  mv_findNodes(["tabMenu", "tabController"])
+  mv_findNodes(["TodoScreen", "GridScreen", "OptionsScreen"])
+  mv_initializeFocusManager(m.global)
+  
+  m.tabController@._initialize({})
+  
+  m.tabMenu.observeField("currentItem", "onTabMenuCurrentItemChange") 
+  m.deeplinkingScreen = createObject("roSGNode", "DeepLinkingScreen")
+  m.deeplinkingNavItem = createNavItem(m.deeplinkingScreen, "deepLinking")
+  m.tabController@.addExistingView(m.deeplinkingScreen)
+  
+  items = createMenuItems()
+  m.isHomeLoaded = false
+  m.tabMenu@.setItems(items)
+end function
+
+function initialize(args = invalid)
+  log_logInfo("initialize")
+  
+  if isDeeplinkingRequired(m.modelLocator.appArgs)
+    log_logInfo("deep linking is required")
+    processDeeplinkingArgs(m.modelLocator.appArgs)
+  else
+    log_logInfo("Going straigh to home - no deep linking")
+    navigateToHomeItem()
+  end if
+end function
+
+function createMenuItems()
+  items = []
+  m.homeItem = createNavItem(m.TodoScreen, "TODO")
+  items.push(m.homeItem)
+  items.push(createNavItem(m.GridScreen, "GRID"))
+  items.push(createNavItem(m.OptionsScreen, "OPTIONS"))
+  return items
+end function
+
+function createNavItem(screen, name, isOptionsMenu = false)
+  navItem = createObject("roSGNode", "NavItem")
+  navItem.id = screen.id
+  navItem.name = name
+  navItem.isOptionsItem = true
+  return navItem
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ Nav Menu Management
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onTabMenuCurrentItemChange(event)
+  log_logInfo("tab menu item changed", m.tabMenu.currentItem)
+  m.tabController@.changeCurrentItem(m.tabMenu.currentItem)
+end function
+
+function onOptionsMenuIsFocusedChange(event)
+  log_logInfo("optionsMenu isFocused changed", m.optionsMenu.isFocused)
+end function
+
+function onIsFocusedOnContentChange(event)
+  log_logInfo("onIsFocusedOnContentChange {0}", m.top.isFocusedOnContent)
+  if m.top.isFocusedOnContent
+    mv_setFocus(m.tabController)
+  else
+    mv_setFocus(m.tabMenu)
+  end if
+end function
+
+function navigateToHomeItem()
+  m.tabMenu.currentItem = m.homeItem
+  m.isHomeLoaded = true
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ Deep Linking
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function isDeeplinkingRequired(args)
+  return args <> invalid and args.contentId <> invalid and args.contentId <> "" and args.mediaType <> invalid and args.mediaType <> ""
+end function
+
+function processDeeplinkingArgs(args)
+  log_logMethod("processDeeplinkingArgs", args)
+  ' here you would have a task that does the work for you, being run in a roku promise
+  'rokuPromise on a task here
+  'here we're just hard coding it to a fake rsult
+  
+  item = createObject("roSGNode", "ContentNode") 
+  item.id = args.contentID
+  item.title = "title " + args.contentID + " type " + args.mediaType
+  
+  collection = createObject("roSGNode", "ContentNode") 
+  collection.id = "c_" + args.contentID
+  selection = createObject("roSGNode", "Selection") 
+  selection.currentItem = item
+  selection.collection = collection
+  
+  if args.mediaType = "vod" or args.mediaType = "episode"
+    action = "play"
+  else
+    action = "grid"
+  end if
+  
+  deeplinkingData = {
+    "isValid": true
+    "selection": selection
+    "mediaType": args.mediaType
+    "action": action
+  }
+  onDeeplinkingTaskResult(deeplinkingData)
+end function
+
+function onDeeplinkingTaskResult(deepLinkingData)
+  log_logMethod("onDeeplinkingTaskResult deeplinkingData", deepLinkingData)
+  
+  m.modelLocator.deeplinkingData = deepLinkingData
+  
+  if m.modelLocator.deeplinkingData.isValid
+    enterDeeplinking()
+  else
+    
+    if not m.isHomeLoaded
+      log_logInfo("App must've done deep linking from lauch, loading home now")
+      navigateToHomeItem()
+    end if
+  end if
+end function
+
+function enterDeeplinking()
+  log_logMethod("enterDeeplinking")
+  m.isInDeeplinkMode = true
+  m.preDeeplinkingItem = m.tabController.currentItem
+  m.tabController@.changeCurrentItem(m.deeplinkingNavItem)
+  m.tabMenu.visible = false
+  mv_setFocus(m.tabController)
+end function
+
+function exitFromDeeplinking(args = invalid)
+  log_logMethod("exitFromDeeplinking")
+  m.isInDeeplinkMode = false
+  m.tabMenu.visible = true
+  
+  if m.preDeeplinkingItem <> invalid
+    m.tabController@.changeCurrentItem(m.preDeeplinkingItem)
+  else
+    navigateToHomeItem()
+  end if
+  mv_setFocus(m.tabMenu)
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ App Services
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+'these are functions that the AppController provides to the app
+'via mixin/notification mechanism
+
+function playSelection(selection)
+  log_logInfo("playSelection")
+  'this is a simple example - in my apps, the videoplayer is usually
+  'long lived, and is an xml element in this view (i.e. AppController)
+  m.videoPlayer = createObject("roSGNode", "VideoPlayer")
+  m.videoPlayer.selection = selection
+  toggleVideoPlayerVisible(true)
+end function
+
+function toggleVideoPlayerVisible(isVisible)
+  m.tabMenu.visible = not isVisible and not m.isInDeeplinkMode
+  if isVisible
+    m.tabController.currentView.navController@.push(m.videoPlayer)
+    mv_setFocus(m.tabController.currentView.navController)
+  else
+    m.tabController.currentView.navController@.pop()
+    mv_setFocus(m.tabController.currentView)
+  end if
+end function
+
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ Key Handling
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onKeyPressDown() as boolean
+  if not m.top.isFocusedOnContent
+    m.top.isFocusedOnContent = true
+  end if
+  return true
+end function
+
+function onKeyPressUp() as boolean
+  m.top.isFocusedOnContent = false
+  return true
+end function
+
+function onKeyPressOption() as boolean
+  m.global.appController.isFocusedOnContent = false
+  m.tabMenu.currentItem = m.OptionsScreen.navItem
+  return true
+end function
+
+function onKeyPressBack() as boolean
+  if not m.top.isFocusedOnContent
+    m.top.isFocusedOnContent = true
+  end if
+  return true
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ Lifecycle
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onGainedFocus(isSelfFocused) as void
+
+  if isSelfFocused
+    onIsFocusedOnContentChange(invalid)
+  end if
+
+end function

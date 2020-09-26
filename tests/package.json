@@ -1,0 +1,37 @@
+{
+  "name": "maestro-roku-core-tests",
+  "version": "0.1.0",
+  "description": "A development platform for building roku channels in brighterscript. Core Library",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgejecook/maestro-roku-core.git"
+  },
+  "keywords": [
+    "brightscript",
+    "mvvm",
+    "framework",
+    "fun"
+  ],
+  "author": "George Cook",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/georgejecook/maestro-roku-core/issues"
+  },
+  "homepage": "https://github.com/georgejecook/maestro-roku-core#readme",
+  "ts-node": {
+    "transpileOnly": true,
+    "compileOptions": {
+      "incremental": true,
+      "allowJs": false
+    }
+  },
+  "ropm": {
+    "rootDir": "src"
+  }
+}
