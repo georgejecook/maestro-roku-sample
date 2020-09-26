@@ -1,4 +1,4 @@
-var fs = require('fs-extra');
+ar fs = require('fs-extra');
 var path = require('path');
 var childProcess = require('child_process');
 var chalk = require('chalk');
