@@ -22,6 +22,6 @@ A development platform for building roku channels in brighterscript. View librar
  - `npm run build`
 
 ## Working on parts of maestro
- - Follow instructions for get started
+ - `npm install --only=dev`
  - `npm run install-local`
  - `npm run build`
