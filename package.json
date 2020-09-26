@@ -18,8 +18,7 @@
     "brighterscript": "^0.15.0",
     "chalk": "^4.1.0",
     "fs-extra": "^9.0.1",
-    "ropm": "^0.5.0",
-    "yargs": "^16.0.3"
+    "ropm": "^0.5.0"
   },
   "repository": {
     "type": "git",

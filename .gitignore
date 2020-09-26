@@ -34,3 +34,4 @@ local.properties
 node_modules/
 out
 **/roku_modules/
+package-lock.json
