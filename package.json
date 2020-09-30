@@ -2,17 +2,12 @@
   "name": "maestro-roku-sample",
   "version": "0.2.4",
   "description": "A development platform for building roku channels in brighterscript. Sample app",
-  "directories": {
-    "doc": "docs"
-  },
-  "files": [
-    "dist/**/!(manifest)*"
-  ],
   "dependencies": {
-    "log": "npm:maestro-roku-log@^0.2.2",
-    "mc": "npm:maestro-roku-core@^0.2.5",
-    "mioc": "npm:maestro-roku-ioc@^0.2.5",
-    "mv": "npm:maestro-roku-view@^0.2.14"
+    "log": "file:../roku-log",
+    "mc": "file:../maestro-roku-core",
+    "mioc": "file:../maestro-roku-ioc",
+    "mv": "file:../maestro-roku-view",
+    "mx": "file:../maestro-roku-mvvm"
   },
   "devDependencies": {
     "brighterscript": "^0.15.0",

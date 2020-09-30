@@ -1,52 +1,49 @@
 import "pkg:/source/roku_modules/log/LogMixin.brs"
+import "pkg:/source/roku_modules/mioc/MIOC.brs"
+import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku_modules/mc/Utils.brs"
 
 function Init() as void
-  CreateObject("roSGNode", "TrackerTask")
-  m.global.addFields({"isFocusLocked": false})
-  m.top.rLog = log_initializeLog()
-  m.top.rLog.logLevel = 5
-  m.top.rLog.excludeFilters = ["TabController"]  
+  createObject("roSGNode", "TrackerTask")
+
+  m.global.addFields({ "isFocusLocked": false })
+  m.top._rLog = log_initializeLogManager(["log_PrintTransport", "log_ScreenTransport"], 5)
   log_registerLogger("MainScene")
-  log_logInfo("init")
+  m.logInfo("Maestro 1.0 sample application. Featuring rLog")
 end function
-  
-  ' /**
-  '  * @member begin
-  '  * @memberof module:MainScene
-  '  * @instance
-  '  * @description This would be called when all initial data is loaded. The app would show a loading spinner and loading background until this point
-  '  * @param {paramType} paramDescription
-  '  * @returns {returnType} returnDescription
-  '  */
+
+' /**
+'  * @member begin
+'  * @memberof module:MainScene
+'  * @instance
+'  * @description This would be called when all initial data is loaded. The app would show a loading spinner and loading background until this point
+'  * @param {paramType} paramDescription
+'  * @returns {returnType} returnDescription
+'  */
 function begin(args = invalid)
-  log_logInfo("begin")
+  m.logInfo("begin")
+  m.top._global = m.global
   initializeIOC()
-  m.modelLocator.appArgs = args
+  mioc_initialize()
 
-  log_logInfo("starting the bootstrap task to orchestrate our app init/loading tasks")
-  ' my apps have a task here that manages the various app initialization activities
-  ' m.bootstrapSequence = crateObject("roSGNode", "bootstrapTasks")
-  ' m.loadingSequence.observeField("isComplete", "onIsBootstrapTasksComplete")
-  ' let's just pretend it did it for now
-  onIsBootstrapTasksComplete()
+  m.logInfo("starting the bootstrap task to orchestrate our app init/loading tasks")
+  boostrapTask = mc_Tasks_createTask("BootStrapSequence", invalid, onBootStrapSequenceComplete)
+  m.top.appendChild(boostrapTask)
+  ' onBootStrapSequenceComplete()
 end function
 
-function onIsBootstrapTasksComplete()
-  log_logInfo("boot strap is complete - showing main screen")
+function onBootStrapSequenceComplete(result)
+  m.logInfo("boot strap is complete, with result", result, " - showing main screen")
 
-  m.top.appController = createObject("roSGNode", "AppController")
-  m.global.addFields({"appController": m.top.appController})
-  m.modelLocator.appController = m.top.appController
-  m.top.appendChild(m.top.appController)
-  m.top.appController@._initialize()
-  m.top.appController.setFocus(true)
+  appController = m.top.findNode("mainGroup").createChild("AppController")
+  mioc_setInstance("appController", appController)
+  m.top._appController = appController
+  appController@._initialize()
+  appController.setFocus(true)
 end function
 
 function initializeIOC()
-  log_logInfo("initializing the IOD container")
-  'we use a simple modelLocator for now
-  'later we'd load our IOC container here
-  m.modelLocator = createObject("roSGNode", "ModelLocator")
-  m.top._modelLocator = m.modelLocator
-  m.global.addFields({"modelLocator": m.modelLocator})
+  m.logInfo("initializing the IOC container")
+  'TODO -set any important things here in the ioc
+  mioc_createContainer()
 end function

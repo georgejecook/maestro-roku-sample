@@ -7,14 +7,14 @@
   -->
     <interface>
         <!-- pointers to interesting objects -->
-        <field id="_modelLocator" type="node" />
-        <field id="rLog" type="node" />
-        <field id="AppController" type="node" />
+        <field id="_rLog" type="node" />
+        <field id="_appController" type="node" />
+        <field id="_global" type="node" />
 
         <!-- call this when you are ready to go! -->
         <function name="begin" />
     </interface>
     <children>
-
+      <Group id="mainGroup" />
     </children>
 </component>

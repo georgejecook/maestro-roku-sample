@@ -1,35 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="AppController" extends="mv_BaseView" 
-	
-	>
-	<interface>
-    <field id="isFocusedOnContent" type="boolean" value="false" onChange="onIsFocusedOnContentChange" />
+<?xml version='1.0' encoding='UTF-8'?>
+<component
+    name='AppController'
+    extends='mv_BaseView'>
+  <interface>
+    <field
+        id='isFocusedOnContent'
+        type='boolean'
+        value='false'
+        onChange='onIsFocusedOnContentChange' />
 
     <!-- Global app services -->
-    <function name="exitFromDeepLinking" />
+    <function name='exitFromDeepLinking' />
 
     <!-- call this when wanting to enter deep linking, if for example
     from live deeplinking roInputEvent -->
-    <function name="processDeeplinkingArgs" />
+    <function name='processDeeplinkingArgs' />
 
-    <function name="playSelection" />
-    <function name="toggleVideoPlayerVisible" />
-	</interface>
+    <function name='playSelection' />
+    <function name='toggleVideoPlayerVisible' />
+  </interface>
 
-	<children>
-		<!-- Main Menu -->
-		<LayoutGroup id="topNav" 
-			layoutDirection="horizontal" 
-			horizAlignment="right"
-			translation="[1080,50]"
-			>
-      <NavItemMenu 
-        id="tabMenu" 
-        />
+  <children>
+    <!-- Main Menu -->
+    <LayoutGroup
+        id='topNav'
+        layoutDirection='horizontal'
+        horizAlignment='right'
+        translation='[1080,50]'>
 		</LayoutGroup>
-
-    <!-- Nav item registry -->
-		<TabController id="tabController"/>
-	</children>
+    <Video id='video' />
+  </children>
 
 </component>

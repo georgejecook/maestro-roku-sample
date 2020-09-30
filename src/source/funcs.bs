@@ -1,0 +1,7 @@
+
+function makeFunc()
+  m.func = function(args)
+    ? "Toast"
+  end function
+  ? "func1" ; m.func
+end function

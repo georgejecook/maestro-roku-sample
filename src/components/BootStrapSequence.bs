@@ -1,0 +1,25 @@
+
+function init() as void
+  m.top.observeField("control", "onControlChange")
+end function
+
+function onControlChange()
+  if m.top.control = "RUN"
+    start()
+  end if
+end function
+
+function start()
+  m.logInfo("starting bootstrap")
+  timer = m.top.createChild("Timer")
+  timer.duration = 0.2
+  timer.observeField("fire", "onDummyInitTimerFire")
+  timer.control = "start"
+end function
+
+function onDummyInitTimerFire()
+  m.logInfo("starting bootstrapFinished")
+  m.top.output = {
+    isOK: true
+  }
+end function

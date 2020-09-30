@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component
+    name='BootStrapSequence'
+    extends='mv_BaseView'>
+  <!-- In all my apps I have an object like this that orchestrates all the 
+    initialization for me. It may/may not call out to tasks (this is not a task)
+  -->
+  <interface>
+    <field
+        id='control'
+        type='string' />
+    <field
+        id='output'
+        type='assocarray' />
+  </interface>
+  <children>
+        
+    </children>
+</component>
