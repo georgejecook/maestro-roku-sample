@@ -3,14 +3,15 @@
   "version": "0.2.4",
   "description": "A development platform for building roku channels in brighterscript. Sample app",
   "dependencies": {
-    "log": "file:../roku-log",
+    "log": "file:../../roku-log/roku-log",
     "mc": "file:../maestro-roku-core",
     "mioc": "file:../maestro-roku-ioc",
+    "ml": "file:../maestro-roku-list",
     "mv": "file:../maestro-roku-view",
     "mx": "file:../maestro-roku-mvvm"
   },
   "devDependencies": {
-    "brighterscript": "^0.15.0",
+    "brighterscript": "^0.23.1",
     "chalk": "^4.1.0",
     "fs-extra": "^9.0.1",
     "ropm": "^0.5.0"
@@ -47,7 +48,8 @@
     "install-local": "node scripts/install-local.js",
     "install-pull-local": "node scripts/install-local.js --pull",
     "uninstall-local": "node scripts/uninstall-local.js",
-    "build": "npx bsc",
-    "test": "cd tests && ropm install && bsc"
+    "build-dev": "npx bsc --project bsconfig-dev.json",
+    "build-prod": "npx bsc --project bsconfig-prod.json",
+    "build-test": "cd tests && ropm install && cd .. && bsc --project bsconfig-test.json"
   }
 }

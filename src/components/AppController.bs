@@ -1,21 +1,61 @@
 import "pkg:/source/roku_modules/mioc/MIOC.brs"
 import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku_modules/mx/BaseObservable.brs"
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ Initialization
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function Init()
-  log_registerLogger("AppController")
-  mv_initializeFocusManager(m.global)
+  log.registerLogger("AppController")
+  mv.initializeFocusManager(m.global)
   m.video = m.top.findNode("video")
   m.content = createObject("roSGNode", "ContentNode")
-  ''TODO
   m.video.content = m.content
-  mc_Tasks_observeNodeField(m.video, "errorMsg", onVideoErrorChange)
-  mc_Tasks_observeNodeField(m.video, "state", onVideoStateChange)
-  m.video.control = "play"
+  mc.tasks.observeNodeField(m.video, "errorMsg", onVideoErrorChange)
+  mc.tasks.observeNodeField(m.video, "state", onVideoStateChange)
+  m.infoLabel = m.top.findNode("infoLabel")
+  initFlyweight()
 end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ flyweight
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function initFlyweight()
+  m.cellProvider = createObject("roSGNode", "ml_CellProvider") 
+  m.top._cellProvider = m.cellProvider
+  m.global.addFields({ "cellProvider": m.cellProvider })
+
+  m.cellTracker = createObject("roSGNode", "ml_CellTracker") 
+  m.top._cellTracker = m.cellTracker
+  m.global.addFields({ "cellTracker": m.cellTracker })
+  m.top.addFields({ "_global": m.global })
+
+
+  mc.tasks.observeNodeField(m.video, "errorMsg", onVideoErrorChange)
+  mc.tasks.observeNodeField(m.infoLabel, "numberOfCellsInUse", onInfoChange)
+  mc.tasks.observeNodeField(m.infoLabel, "numberOfCells", onInfoChange)
+  mc.tasks.observeNodeField(m.infoLabel, "numberOfCellsInUse", onInfoChange)
+  mc.tasks.observeNodeField(m.infoLabel, "numberOfCells", onInfoChange)
+
+  m.infoLabel = m.top.findNode("infoLabel")
+
+end function
+
+function prebakeCells()
+  m.cellProvider@.addPreBakedCells(100, "ImageCell")
+  m.cellProvider@.addPreBakedCells(100, "SimpleCell")
+  m.cellProvider@.addPreBakedCells(100, "SimpleCell2")
+  m.cellProvider@.addPreBakedCells(0, "ComplexCell")
+
+  ? "finished adding prebaked cells"
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ video
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 function onVideoErrorChange(error)
   m.logError("error playing video: ", error)
@@ -27,8 +67,17 @@ end function
 
 function initialize(args = invalid)
   m.logInfo("initialize")
-  launchArgs = mioc_getInstance("launchArgs")
+  launchArgs = mioc.getInstance("launchArgs")
 end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ callbacks
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onInfoChange()
+  m.infoLabel.text = " Light cells (" + str(m.cellTracker.numberOfCellsInUse) + "/" + str(m.cellTracker.numberOfCells) + ") - Real cells (" + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ")"
+end function
+
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ Key Handling

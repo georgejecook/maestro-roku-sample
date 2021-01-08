@@ -5,8 +5,7 @@
   "directories": {
     "doc": "docs"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {},
   "repository": {
     "type": "git",

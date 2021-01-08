@@ -1,0 +1,48 @@
+function init()
+  m.theRect = m.top.findNode("theRect")
+  m.poster = m.top.findNode("poster")
+  m.poster2 = m.top.findNode("poster2")
+  m.poster3 = m.top.findNode("poster3")
+  m.theLabel = m.top.findNode("theLabel")
+  ' m.theLabel2 = m.top.findNode("theLabel2")
+  m.theLabel3 = m.top.findNode("theLabel3")
+  ' m.focusColorInterp = m.top.findNode("focusColorInterp")
+  ' m.focusColorInterp.fieldToInterp = "theRect.color"
+end function
+
+function itemContentChanged()
+  m.theLabel.text = "C" + m.top.itemContent.title
+  ' m.theLabel2.text = m.top.itemContent.description
+  m.theLabel3.text = m.top.itemContent.description + " " + m.top.itemContent.description
+  m.poster.uri = m.top.itemContent.HDGRIDPOSTERURL
+  ' m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+  m.poster3.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+end function
+
+function currTargetChanged()
+  if m.top.index = 0
+    print "currTarget for item "; m.top.index; " changed to "; m.top.currTarget
+  end if
+end function
+
+function currRectChanged()
+'   m.theRect.width = m.top.currRect.width
+'   m.theRect.height = m.top.currRect.height - 100
+end function
+
+function focusPercentChanged()
+  ' print "focusPercent for item "; m.top.index; " changed to "; m.top.focusPercent
+  ' if (m.top.groupHasFocus)
+  '   m.focusColorInterp.fraction = m.top.focusPercent
+  ' else
+  '   m.focusColorInterp.fraction = 0
+  ' end if
+end function
+
+function onKeyEvent(key as string, press as boolean) as boolean
+  handled = false
+  
+  ? "key " ; key ; " press "; press
+  
+  return handled
+end function

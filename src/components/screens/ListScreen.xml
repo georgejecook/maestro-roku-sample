@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<component
+    name='ListScreen'
+    extends='mv_BaseScreen'>
+  <interface>
+    <field
+        id='isRoot'
+        type='boolean'
+        value='false' />
+    <field
+        id='_cellProvider'
+        type='node' />
+    <field
+        id='_cellTracker'
+        type='node' />
+    <field
+        id='_defaultCellType'
+        type='string'
+        value='Imagecell' />
+        <!-- value='ComplexCell' /> -->
+    <field
+        id='_numberOfRows'
+        type='integer'
+        value='30' />
+    <field
+        id='_addTypeOnes'
+        type='integer'
+        onChange='onAddTypeOnes'
+        alwaysNotify='true' />
+    <field
+        id='_addTypeComplex'
+        type='integer'
+        onChange='onAddComplex'
+        alwaysNotify='true' />
+    <field
+        id='_addTypeTwos'
+        type='integer'
+        onChange='onAddTypeTwos'
+        alwaysNotify='true' />
+    <field
+        id='_removeItems'
+        type='integer'
+        onChange='onRemove'
+        alwaysNotify='true' />
+    <field
+        id='_showRowItems'
+        type='integer'
+        onChange='onShowRow'
+        alwaysNotify='true' />
+    <field
+        id='_hideRowItems'
+        type='integer'
+        onChange='onHideRow'
+        alwaysNotify='true' />
+    <field
+        id='_showItems'
+        type='integer'
+        onChange='onShowItems'
+        alwaysNotify='true' />
+    <field
+        id='_hideItems'
+        type='integer'
+        onChange='onHideItems'
+        alwaysNotify='true' />
+    <field
+        id='_addTypeOnePrebakes'
+        type='integer'
+        onChange='onAddTypeOnePrebakes'
+        alwaysNotify='true' />
+    <field
+        id='_addTypeTwoPrebakes'
+        type='integer'
+        onChange='onAddTypeTwoPrebakes'
+        alwaysNotify='true' />
+
+    <field
+        id='_reset'
+        type='boolean'
+        onChange='onResetChange'
+        alwaysNotify='true' />
+
+    <field
+        id='_m'
+        type='assocarray' />
+
+  </interface>
+  <children>
+    <Rectangle
+        width='1920'
+        height='1080'
+        color='#b286f0' />
+    <Group id='listHolder' />
+  </children>
+
+
+</component>

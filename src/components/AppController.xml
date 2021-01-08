@@ -29,6 +29,16 @@
         translation='[1080,50]'>
 		</LayoutGroup>
     <Video id='video' />
+
+    <Rectangle
+        color='#ff0000'
+        width='1920'
+        height='100'
+        translation='[0, 1000]' />
+    <Label
+        id='infoLabel'
+        translation='[50, 1000]'
+        color='#ffffff' />
   </children>
 
 </component>

@@ -1,5 +1,4 @@
 sub Main(args as dynamic)
-  ' if (type(Rooibos__Init) = "Function") then Rooibos__Init(invalid, invalid, invalid, m)
   InitScreen()
 end sub
 

@@ -3,7 +3,8 @@
   "files": [
     "manifest",
     "source/**/*.*",
-    "components/**/*.*"
+    "components/**/*.*",
+    "!**/*.spec.bs"
   ],
   "autoImportComponentScript": true,
   "createPackage": false,
@@ -20,7 +21,6 @@
   ],
   "plugins": [
     "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js",
     "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
   ],
   "rooibos": {

@@ -7,8 +7,8 @@ function Init() as void
   createObject("roSGNode", "TrackerTask")
 
   m.global.addFields({ "isFocusLocked": false })
-  m.top._rLog = log_initializeLogManager(["log_PrintTransport", "log_ScreenTransport"], 5)
-  log_registerLogger("MainScene")
+  m.top._rLog = log.initializeLogManager(["log_PrintTransport", "log_ScreenTransport"], 5)
+  log.registerLogger("MainScene")
   m.logInfo("Maestro 1.0 sample application. Featuring rLog")
 end function
 
@@ -24,10 +24,9 @@ function begin(args = invalid)
   m.logInfo("begin")
   m.top._global = m.global
   initializeIOC()
-  mioc_initialize()
-
+  mioc.initialize()
   m.logInfo("starting the bootstrap task to orchestrate our app init/loading tasks")
-  boostrapTask = mc_Tasks_createTask("BootStrapSequence", invalid, onBootStrapSequenceComplete)
+  boostrapTask = mc.tasks.createTask("BootStrapSequence", invalid, onBootStrapSequenceComplete)
   m.top.appendChild(boostrapTask)
   ' onBootStrapSequenceComplete()
 end function
@@ -36,7 +35,7 @@ function onBootStrapSequenceComplete(result)
   m.logInfo("boot strap is complete, with result", result, " - showing main screen")
 
   appController = m.top.findNode("mainGroup").createChild("AppController")
-  mioc_setInstance("appController", appController)
+  mioc.setInstance("appController", appController)
   m.top._appController = appController
   appController@._initialize()
   appController.setFocus(true)
@@ -45,5 +44,5 @@ end function
 function initializeIOC()
   m.logInfo("initializing the IOC container")
   'TODO -set any important things here in the ioc
-  mioc_createContainer()
+  mioc.createContainer()
 end function

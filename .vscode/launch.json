@@ -7,9 +7,32 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "SAMPLES",
+      "name": "Run",
       "stopOnEntry": false,
-      "preLaunchTask": "build",
+      "preLaunchTask": "build-dev",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "rootDir": "${workspaceFolder}/build",
+      "sourceDirs": [
+        "${workspaceFolder}/src"
+      ],
+      "files": [
+        "manifest",
+        "source/**/*.*",
+        "components/**/*.*",
+        "images/**/*.*",
+        "font/**/*.*",
+        "!*.zip",
+        "!**/*.zip"
+      ],
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "Tests",
+      "stopOnEntry": false,
+      "preLaunchTask": "build-test",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
