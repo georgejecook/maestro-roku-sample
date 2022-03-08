@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component
     name='AppController'
-    extends='mv_BaseView'>
+    extends='mv_BaseScreen'>
   <interface>
     <field
         id='isFocusedOnContent'
@@ -9,15 +9,6 @@
         value='false'
         onChange='onIsFocusedOnContentChange' />
 
-    <!-- Global app services -->
-    <function name='exitFromDeepLinking' />
-
-    <!-- call this when wanting to enter deep linking, if for example
-    from live deeplinking roInputEvent -->
-    <function name='processDeeplinkingArgs' />
-
-    <function name='playSelection' />
-    <function name='toggleVideoPlayerVisible' />
   </interface>
 
   <children>
@@ -28,8 +19,7 @@
         horizAlignment='right'
         translation='[1080,50]'>
 		</LayoutGroup>
-    <Video id='video' />
-
+    <Group id='contentGroup' />
     <Rectangle
         color='#ff0000'
         width='1920'

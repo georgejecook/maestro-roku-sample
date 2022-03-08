@@ -1,0 +1,10 @@
+' @MNode("Nodetest", "Node")
+class NodeTest
+
+  public function new(node) 
+  end function
+  
+  public foo
+  function getName(value, node)
+  end function
+end class

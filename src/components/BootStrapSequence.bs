@@ -10,7 +10,7 @@ function onControlChange()
 end function
 
 function start()
-  m.logInfo("starting bootstrap")
+  m.log.info("starting bootstrap")
   timer = m.top.createChild("Timer")
   timer.duration = 0.2
   timer.observeField("fire", "onDummyInitTimerFire")
@@ -18,7 +18,7 @@ function start()
 end function
 
 function onDummyInitTimerFire()
-  m.logInfo("starting bootstrapFinished")
+  m.log.info("starting bootstrapFinished")
   m.top.output = {
     isOK: true
   }

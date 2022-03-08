@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8' ?>
+<?xml version='1.0' encoding='utf-8'?>
 
 <component
     name='ComplexCell'
@@ -36,9 +36,8 @@
     <Rectangle
         id='theRect'
         color='#8034eb'
-        width="300"
-        height="300"
-        >
+        width='300'
+        height='300'>
     </Rectangle>
     <Poster
         id='poster'

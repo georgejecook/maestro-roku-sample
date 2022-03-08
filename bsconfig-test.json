@@ -10,12 +10,7 @@
   "stagingFolderPath": "build",
   "diagnosticFilters": [
     {
-      "src": "**/roku_modules/**/*.*",
-      "codes": [
-        1107,
-        1009,
-        1001
-      ]
+      "src": "**/roku_modules/**/*.*"
     }
   ],
   "plugins": [

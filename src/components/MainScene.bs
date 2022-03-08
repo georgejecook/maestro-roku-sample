@@ -7,9 +7,10 @@ function Init() as void
   createObject("roSGNode", "TrackerTask")
 
   m.global.addFields({ "isFocusLocked": false })
-  m.top._rLog = log.initializeLogManager(["log_PrintTransport", "log_ScreenTransport"], 5)
-  log.registerLogger("MainScene")
-  m.logInfo("Maestro 1.0 sample application. Featuring rLog")
+  m.top._rLog = log.initializeLogManager(["log_PrintTransport"], 5)
+  ' m.top._rLog = log.initializeLogManager(["log_PrintTransport", "log_ScreenTransport"], 5)
+  m.log = new log.Logger("MainScene")
+  m.log.info("Maestro 1.0 sample application. Featuring rLog")
 end function
 
 ' /**
@@ -21,18 +22,17 @@ end function
 '  * @returns {returnType} returnDescription
 '  */
 function begin(args = invalid)
-  m.logInfo("begin")
+  m.log.info("begin")
   m.top._global = m.global
   initializeIOC()
   mioc.initialize()
-  m.logInfo("starting the bootstrap task to orchestrate our app init/loading tasks")
+  m.log.info("starting the bootstrap task to orchestrate our app init/loading tasks")
   boostrapTask = mc.tasks.createTask("BootStrapSequence", invalid, onBootStrapSequenceComplete)
   m.top.appendChild(boostrapTask)
-  ' onBootStrapSequenceComplete()
 end function
 
 function onBootStrapSequenceComplete(result)
-  m.logInfo("boot strap is complete, with result", result, " - showing main screen")
+  m.log.info("boot strap is complete, with result", result, " - showing main screen")
 
   appController = m.top.findNode("mainGroup").createChild("AppController")
   mioc.setInstance("appController", appController)
@@ -42,7 +42,7 @@ function onBootStrapSequenceComplete(result)
 end function
 
 function initializeIOC()
-  m.logInfo("initializing the IOC container")
+  m.log.info("initializing the IOC container")
   'TODO -set any important things here in the ioc
   mioc.createContainer()
 end function

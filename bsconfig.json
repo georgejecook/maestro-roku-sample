@@ -1,4 +1,5 @@
 {
+  "stagingFolderPath": "/tmp/out",
   "rootDir": "src",
   "files": [
     "manifest",
@@ -7,21 +8,23 @@
   ],
   "autoImportComponentScript": true,
   "createPackage": false,
-  "stagingFolderPath": "build",
   "diagnosticFilters": [
     {
-      "src": "**/roku_modules/**/*.*",
+      "src": "**/roku_modules/**/*.*"
+    },
+    {
+      "src": "**/WhiteList.xml",
       "codes": [
-        1107,
-        1009,
-        1001
+        1067
       ]
     }
   ],
   "plugins": [
-    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js",
     "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
+  ],
+  "ignore": [
+    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
+    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js"
   ],
   "rooibos": {
     "isRecordingCodeCoverage": false,

@@ -1,0 +1,267 @@
+import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku_modules/mx/BaseObservable.brs"
+
+function init()
+  m.video = m.top.findNode("video")
+  m.video.content = m.content
+  m.isFirstLoadComplete = false
+  m.numberOfImages = 100
+  m.numberToLoad = 5
+  m.numberOfPosters = 2
+  m.posterIndex = 0
+  m.posters = []
+  m.posterAnims = []
+  m.poster = invalid
+  m.otherPoster = invalid
+  m.lastTask = invalid
+  m.currentIndex = 0
+  m.lastLoadedIndex = 0
+  m.cacheMap = {}
+  m.content = createObject("roSGNode", "ContentNode")
+  m.content.url = "https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8"
+  m.video.content = m.content
+  m.video.control = "play"
+
+  mc.tasks.observeNodeField(m.video, "errorMsg", onVideoErrorChange)
+  mc.tasks.observeNodeField(m.video, "state", onVideoStateChange)
+  ' mc.tasks.observeNodeField(m.delayTimer, "fire", onDelayTimerFire)
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ video
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+function onVideoErrorChange(error)
+  m.log.error("error playing video: ", error)
+end function
+
+function onVideoStateChange(state)
+  m.log.info("new video state: ", state)
+  if state = "playing"
+    startFadeAnim(m.poster)
+  end if
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ images
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function moveIndex(direction)
+  m.log.info("move", direction)
+  m.currentIndex += direction
+  if m.currentIndex < 0
+    m.currentIndex = m.numberOfImages - 1
+  else if m.currentIndex > m.numberOfImages - 1
+    m.currentIndex = 0
+  end if
+
+  m.log.info("ci", m.currentIndex)
+  if m.currentIndex mod 3 = 0 and m.currentIndex + 5 > m.lastLoadedIndex
+    cacheImages()
+  end if
+
+  key = m.currentIndex.toStr().trim()
+  swapPosters()
+  mc.tasks.cleanNodeObserver(m.poster, "loadStatus")
+  m.waitTask = mc.tasks.observeNodeField(m.poster, "loadStatus", onCurrentLoadStatusChange)
+  m.poster.uri = m.cacheMap[key]
+end function
+
+function onCurrentLoadStatusChange(state)
+  ? "onCurrentLoadStatusChange " ; state
+  if state = "ready" or state = "failed"
+    mc.tasks.cleanNodeObserver(m.poster, "loadStatus")
+    m.video.control = "pause"
+    mc.tasks.cancelWaitTimer(m.timer)
+    m.timer = mc.tasks.waitAFrame(doPosterAnim, 0.1)
+  end if
+end function
+
+function doPosterAnim()
+  startMoveAnim(m.poster)
+  mc.tasks.cancelWaitTimer(m.hideTimer)
+  m.hideTimer = mc.tasks.waitAFrame(hidePoster, 0.3)
+
+end function
+
+function hidePoster()
+  ' startFadeAnim(m.poster)
+  m.content = createObject("roSGNode", "ContentNode")
+  m.content.url = "https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8"
+  m.video.content = m.content
+  m.video.control = "play"
+
+end function
+
+function swapPosters()
+  poster = m.poster
+  m.poster = m.otherPoster
+  m.otherPoster = poster
+end function
+
+function startFadeAnim(target)
+  m.log.info("moving poster", target.id)
+  anim = m.top.findNode("fadeAnim")
+  anim.control = "stop"
+  anim.getChild(0).fieldToInterp = `${target.id}.opacity`
+  anim.control = "start"
+end function
+
+function startMoveAnim(target)
+  m.log.info("moving poster", target.id)
+  target.translation = [1920, 0]
+  target.opacity = 1
+  target.getParent().appendChild(target)
+  anim = m.top.findNode("moveAnim")
+  anim.control = "stop"
+  anim.getChild(0).fieldToInterp = `${target.id}.translation`
+  anim.control = "start"
+end function
+
+function createMoveAnimation(target, duration, fromPos, toPos)
+  animation = createObject("roSGNode", "Animation")
+  animation.id = `${target.id}Animation`
+  animation.delay = 1
+  animation.repeat = false
+  animation.duration = 5
+  animation.easeFunction = "linear"
+
+  floatField = animation.createChild("Vector2DFieldInterpolator")
+  floatField.key = [0.0, 1.0]
+  floatField.keyValue = [fromPos, toPos]
+  floatField.fieldToInterp = ""
+
+  return animation
+end function
+
+function createFadeAnimation(target, duration, fromOpacity, toOpacity)
+  animation = createObject("roSGNode", "Animation")
+  animation.id = `${target.id}OpacityAnimation`
+  animation.duration = duration
+  animation.repeat = false
+  animation.easeFunction = "linear"
+
+  floatField = animation.createChild("FloatFieldInterpolator")
+  floatField.key = [0.0, 1.0]
+  floatField.keyValue = [fromOpacity, toOpacity]
+  floatField.fieldToInterp = "opacity"
+
+  return animation
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ keypresses
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onKeyPressUp() as boolean
+  ? "pressed up"
+  m.lastTask = mc.tasks.createTask("ImageRequestTask", { args: { reset: true } })
+
+  currentIndex = 0
+  cacheImages()
+  m.cacheMap = {}
+  return true
+end function
+
+function onKeyPressRight() as boolean
+  ? "pressed right"
+  moveIndex(1)
+  return true
+end function
+
+function onKeyPressLeft() as boolean
+  ? "pressed left"
+  moveIndex(-1)
+  return true
+end function
+
+function onKeyPressDown() as boolean
+  ? "pressed up"
+  currentIndex = 0
+  cacheImages()
+  return true
+end function
+
+function onKeyPressOption() as boolean
+  ? "pressed option"
+  return true
+end function
+
+function onKeyPressBack() as boolean
+  return true
+end function
+
+function makePosters()
+  m.posters.push(makePoster(0))
+  m.posters.push(makePoster(1))
+  m.posters.push(makePoster(2))
+  m.posterA = m.posters[0]
+  m.posterB = m.posters[1]
+  m.posterC = m.posters[2]
+  m.posterB.translation = [1920, 0]
+  m.posterC.translation = [1920, 0]
+  m.poster = m.posterA
+  m.nextPoster = m.posterB
+  m.otherPoster = m.posterC
+end function
+
+function makePoster(index)
+  poster = m.top.createChild("Poster")
+  poster.width = 1920
+  poster.height = 1080
+  poster.loadSync = true
+  poster.translation = [0, 0]
+  poster.loadWidth = 1280
+  poster.loadHeight = 720
+  ' poster.loadWidth = 1920
+  ' poster.loadHeight = 1080
+  poster.id = `poster${index}`
+  return poster
+end function
+
+function cacheImages()
+  ' mc.tasks.cancelTask(m.lastTask)
+  ids = []
+  for i = m.lastLoadedIndex to m.lastLoadedIndex + m.numberToLoad
+    ids.push(i)
+  end for
+  m.lastLoadedIndex += m.numberToLoad
+  m.lastTask = mc.tasks.createTask("ImageRequestTask", { args: { ids: ids } }, onCacheImages)
+end function
+
+function onCacheImages(result)
+  if result.isOK
+    m.cacheMap.append(result.data)
+    m.lastTask = invalid
+  end if
+
+  if not m.isFirstLoadComplete
+    m.isFirstLoadComplete = true
+    moveIndex(0)
+  end if
+end function
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ lifecycle
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onShow()
+  m.log.info("onShow")
+end function
+
+function onFirstShow()
+  m.log.info("created", number, "posters")
+  makePosters()
+  cacheImages()
+end function
+
+function onHide()
+end function
+
+function onGainedFocus(isSelfFocused)
+  m.log.info("onGainedFocus", isSelfFocused)
+  if isSelfFocused
+    ' mv.setFocus(m.list)
+  end if
+end function
