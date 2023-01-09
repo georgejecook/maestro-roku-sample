@@ -80,8 +80,11 @@ class DisneyHeroScreen extends mv.BaseScreen
     items = m.createGridData()
     timer.log("makeData")
     m.setFocus(m.loadingIndicator)
+
+    content@.setNotificationsEnabled(false)
     content@.appendChildren(items)
-    m.list.content = content
+
+    m.list@.setContent(content)
     timer.log("set content")
     if m.list.state = "rendered"
       m.onListRenderState("rendered")
@@ -221,21 +224,34 @@ class DisneyHeroScreen extends mv.BaseScreen
     m.contentId++
     row@.appendChildren(m.makeItems(m.defaultCellType, 5))
     m.list.content@.insertChild(row, index)
+    m.list@.synchronizeContent()
   end function
 
   private function removeRow(index as integer)
     m.list.content@.removeChildIndex(index)
+    m.list@.synchronizeContent()
   end function
 
   private function addCell()
     rowContent = m.list.content@.getChild(m.list.focusedRowIndex)
+
+    rowContent@.setNotificationsEnabled(false)
+
     rowContent@.appendChildren(m.makeItems(m.defaultCellType, 1))
     rowContent@.insertChild(m.makeItems(m.defaultCellType, 1), m.list.focusedCellIndex)
+
+    rowContent@.setNotificationsEnabled(true)
+    m.list.content@.notifyUpdate()
+    m.list@.synchronizeContent()
   end function
 
   private function removeCell()
     rowContent = m.list.content@.getChild(m.list.focusedRowIndex)
+    rowContent@.setNotificationsEnabled(false)
     rowContent@.removeChildIndex(m.list.focusedCellIndex)
+    rowContent@.setNotificationsEnabled(true)
+    m.list.content@.notifyUpdate()
+    m.list@.synchronizeContent()
   end function
 
 
