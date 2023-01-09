@@ -63,7 +63,7 @@
     "build": "node scripts/run.js && npx ts-node scripts/cleanup-build.js",
     "build-test": "node scripts/run-test.js",
     "build-sample-app": "node scripts/run-sample-app.js",
+    "build-local": "node scripts/run-local.js && npx ts-node scripts/cleanup-build.js",
     "lint": "npx bsc"
-
   }
 }

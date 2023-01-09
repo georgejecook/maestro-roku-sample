@@ -27,9 +27,6 @@
     },
     {
       "src": "**/RALETrackerTask.*"
-    },
-    {
-      "src": "../src-ml-test-app/**/RALETracker*.*"
     }
   ],
   "emitDefinitions": true,
