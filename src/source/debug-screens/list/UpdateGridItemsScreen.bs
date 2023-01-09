@@ -83,6 +83,7 @@ class UpdateGridItemsScreen extends mv.BaseScreen
       m.log.info("moving an item down")
       m.moveItem(1)
     end if
+    button.isSelected = false
   end function
 
   private function moveItem(direction as integer)
@@ -134,8 +135,12 @@ class UpdateGridItemsScreen extends mv.BaseScreen
     listSettings.rowCreationStrategy = "async"
     listSettings.rowCreationBatchSize = 5
     listSettings.rowCreationBatchDelay = 0.3
+    listSettings.numberItemsToRenderAfter = 5
+    listSettings.numberItemsToRenderBefore = 5
+    listSettings.renderStrategy = "dynamic"
 
     content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
+    content@.setNotificationsEnabled(false)
     timer.log("makeData")
 
     m.setFocus(m.loadingIndicator)
@@ -155,7 +160,7 @@ class UpdateGridItemsScreen extends mv.BaseScreen
     m.log.info("onListRenderState", state)
     if state = "rendered"
       m.setFocus(m.list)
-      m.list@.moveToIndex([0, 0], false)
+      m.list@.moveToRowItemIndex(0, 0)
       m.loadingIndicator.isActive = false
     end if
   end function
@@ -216,9 +221,9 @@ class UpdateGridItemsScreen extends mv.BaseScreen
       m.createRow("complete", 5)
     ]
 
-
-    m.list.content@.insertChildren(m.rows, 1)
+    m.list.content@.insertChildren(m.rows, 0)
     m.list.content@.notifyUpdate()
+    m.list@.synchronizeContent()
   end function
 
   private function removeNonHeaderRows(update = true as boolean)
@@ -229,6 +234,7 @@ class UpdateGridItemsScreen extends mv.BaseScreen
 
     if update
       m.list.content@.notifyUpdate()
+      m.list@.synchronizeContent()
     end if
   end function
 

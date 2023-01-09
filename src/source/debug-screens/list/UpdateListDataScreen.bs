@@ -84,6 +84,7 @@ class UpdateListDataScreen extends mv.BaseScreen
       m.log.info("changing to useGrids", m.isUsingGrids)
       m.resetData()
     end if
+    button.isSelected = false
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

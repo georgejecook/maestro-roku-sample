@@ -165,7 +165,7 @@ class SuperFastScrollScreen extends mv.BaseScreen
     m.log.info("onListRenderState", state)
     if state = "rendered"
       m.setFocus(m.list)
-      m.list@.moveToIndex([0, 0], false)
+      m.list@.moveToRowItemIndex(0, 0)
       m.loadingIndicator.isActive = false
     end if
   end function

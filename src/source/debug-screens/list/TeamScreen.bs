@@ -100,7 +100,7 @@ namespace ml.sample
       m.log.info("onListRenderState", state)
       if state = "rendered"
         m.setFocus(m.list)
-        m.list@.moveToIndex([0, 0], false)
+        m.list@.moveToRowItemIndex(0, 0)
         m.list.visible = true
         m.loadingIndicator.isActive = false
         ' m.list.clippingRect = [0, -5000, 20000, 20000]
@@ -375,6 +375,16 @@ namespace ml.sample
       '   row.opacity = 1 - event.fraction
       ' end if
     end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Key Presses
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function isCapturingAnyKeyPress(key as string, press as boolean) as boolean
+      return key <> "left" or key <> "right"
+    end function
+
 
   end class
 end namespace

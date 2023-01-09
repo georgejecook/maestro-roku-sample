@@ -99,7 +99,7 @@ class ListScreen extends mv.BaseScreen
     m.log.info("onListRenderState", state)
     if state = "rendered"
       ' m.setFocus(m.list)
-      ' m.list@.moveToIndex([0, 0], false)
+      ' m.list@.moveToRowItemIndex(0, 0)
       ' m.list.visible = true
       m.loadingIndicator.isActive = false
     end if
@@ -125,7 +125,7 @@ class ListScreen extends mv.BaseScreen
         if i <> 10
           row0FocusSettings.feedbackStyle = "none"
         end if
-        cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 30)
+        cellSettings = ml.listMixin.createCellSettings("HeroCellEfficient", [1100, 700], 30)
         row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
         row.settings.headerSettings.position = "none"
         row.settings.contentOffset = [400, -30]
@@ -337,13 +337,6 @@ class ListScreen extends mv.BaseScreen
     return true
   end function
 
-  protected override function onKeyPressBack() as boolean
-    if m.top.isRoot <> true
-      m.list.isHidden = true
-      m.pop()
-    end if
-    return true
-  end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ lifecycle

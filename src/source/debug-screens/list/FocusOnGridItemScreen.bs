@@ -75,7 +75,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   end function
 
   private function makeListData()
-    m.list.content = invalid
+    m.list@.setContent(invalid)
 
     timer = new mc.utils.DebugTimer("list")
 
@@ -90,10 +90,11 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     listSettings.numberItemsToRenderAfter = 2
     listSettings.numberItemsToRenderBefore = 1
 
-
     content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
+    content@.setNotificationsEnabled(false)
+
     content@.appendChild(m.createHeaderOnlyData())
-    m.liveRow = m.createRow("live", 20)
+    m.liveRow = m.createRow("live", 20, [100, 350])
     m.upcomingRow = m.createRow("upcoming", 20)
     content@.appendChild(m.liveRow)
     content@.appendChild(m.addRow())
@@ -105,7 +106,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     timer.log("makeData")
     m.setFocus(m.loadingIndicator)
 
-    m.list.content = content
+    m.list@.setContent(content)
 
     timer.log("set content")
     if m.list.state = "rendered"
@@ -141,7 +142,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     m.log.info("onListRenderState", state)
     if state = "rendered"
       m.setFocus(m.list)
-      m.list@.moveToIndex([0, 0], false)
+      m.list@.moveToRowItemIndex(0, 0)
       m.loadingIndicator.isActive = false
     end if
   end function
@@ -154,7 +155,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   end function
 
 
-  private function createRow(title as string, numItems as integer)
+  private function createRow(title as string, numItems as integer, contentOffset = [100, 30] as mc.types.array)
     numCols = 4
     row = createObject("roSGNode", "ml_RowContent")
     row.id = rnd(2147483647).toStr()
@@ -165,7 +166,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     row.firstRowScreenPos = 70
     row.otherRowScreenPos = 70
 
-    row.settings.contentOffset = [100, 30]
+    row.settings.contentOffset = contentOffset
     row.title = title
     row@.appendChildren(m.makeItems(m.defaultCellType, numItems, ""))
     return row

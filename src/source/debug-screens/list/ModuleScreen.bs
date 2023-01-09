@@ -50,15 +50,17 @@ class ModuleScreen extends mv.BaseScreen
     translation = [0, 0]
     size = [1920, 1080]
 
-    m.button = m.createSGNode("Button", m.top, "button", {
-      title: "focus me"
-    })
     m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
       translation: translation
       size: size
       color: "#6a307d"
     })
+    m.button = m.createSGNode("Button", m.top, "button", {
+      text: "focus me"
+    })
+
     m.listHolder = m.createSGNode("Group", m.top, "listHolder")
+    m.listHolder.translation = [0, 200]
     m.componentPool = m.global.componentPool
 
     m.list = m.createSGNode("ml_List", m.listHolder, "list", {
@@ -425,7 +427,7 @@ class ModuleScreen extends mv.BaseScreen
     row = m.list.content@.getChild(m.list.focusedRowIndex)
 
     ? "FOCUSED row CELL INDEX ="; row.focusedCellIndex
-    item = row.getChild(m.list.focusedCellIndex)
+    item = row@.getChild(m.list.focusedCellIndex)
 
     row = m.list.content@.getChild(m.list.focusedRowIndex - 1)
     if row <> invalid
@@ -437,11 +439,14 @@ class ModuleScreen extends mv.BaseScreen
   private function onKeyPressFastForward() as boolean
     ? " MOVE A CELL TO NEXT"
     row = m.list.content@.getChild(m.list.focusedRowIndex)
-    item = row.getChild(m.list.focusedCellIndex)
+    item = row@.getChild(m.list.focusedCellIndex)
 
     row = m.list.content@.getChild(m.list.focusedRowIndex + 1)
+    row@.setNotificationsEnabled(false)
     if row <> invalid
       row@.appendChild(item)
+      row@.setNotificationsEnabled(true)
+      m.list@.synchronizeContent()
     end if
     return true
   end function
