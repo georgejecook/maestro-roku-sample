@@ -79,7 +79,7 @@ class ModuleScreen extends mv.BaseScreen
   end function
 
   private function onResetChange()
-    m.list.content = invalid
+    m.list@.setContent(invalid)
     m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [307, 100], 30)
 
     timer = new mc.utils.DebugTimer("list")
@@ -90,14 +90,19 @@ class ModuleScreen extends mv.BaseScreen
     listSettings.rowCreationStrategy = "async"
     listSettings.rowCreationBatchSize = 5
     listSettings.rowCreationBatchDelay = 0.3
+    listSettings.numberItemsToRenderAfter = 5
+    listSettings.renderStrategy = "dynamic"
+    listSettings.numberItemsToRenderBefore = 5
 
     content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
+    content@.setNotificationsEnabled(false)
+
     ' items = m.createHeaderOnlyData()
     timer.log("makeData")
     m.setFocus(m.loadingIndicator)
     ' content@.appendChildren(items)
     m.list.visible = false
-    m.list.content = content
+    m.list@.setContent(content)
     m.content = content
     timer.log("set content")
     if m.list.state = "rendered"
@@ -115,7 +120,7 @@ class ModuleScreen extends mv.BaseScreen
     m.log.info("onListRenderState", state)
     if state = "rendered"
       m.setFocus(m.list)
-      m.list@.moveToIndex([0, 0], false)
+      m.list@.moveToRowItemIndex(0, 0)
       m.list.visible = true
       m.loadingIndicator.isActive = false
     end if
@@ -321,8 +326,11 @@ class ModuleScreen extends mv.BaseScreen
       end if
     end for
 
-    m.list.content@.insertChildren(newModules, 1)
-    m.list.content@.notifyUpdate()
+    m.list.content@.setNotificationsEnabled(false)
+
+    m.list.content@.insertChildren(newModules, 0)
+    m.list.content@.setNotificationsEnabled(true)
+    m.list@.synchronizeContent()
   end function
 
   private function removeNonHeaderRows(update = true as boolean)
@@ -337,6 +345,7 @@ class ModuleScreen extends mv.BaseScreen
 
     if update
       m.list.content@.notifyUpdate()
+      m.list@.synchronizeContent()
     end if
   end function
 
