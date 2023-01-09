@@ -2,20 +2,29 @@
   "name": "maestro-roku-sample",
   "version": "0.2.4",
   "description": "A development platform for building roku channels in brighterscript. Sample app",
+  "main": "index.js",
   "dependencies": {
-    "log": "npm:roku-log",
-    "mc": "npm:maestro-roku-core",
-    "mioc": "npm:maestro-roku-ioc",
-    "ml": "npm:maestro-roku-list",
-    "mv": "npm:maestro-roku-view",
-    "mx": "npm:maestro-roku-mvvm",
-    "roku-requests": "^0.2.0"
+    "log": "npm:roku-log@^0.9.3",
+    "maestro": "npm:maestro-roku@0.54.7"
   },
   "devDependencies": {
-    "brighterscript": "file:../../vsc/brighterscript",
-    "chalk": "^4.1.0",
-    "fs-extra": "^9.0.1",
-    "ropm": "^0.5.0"
+    "@rokucommunity/bslint": "0.7.1",
+    "@types/chai": "^4.2.3",
+    "@types/chai-subset": "^1.3.1",
+    "@types/fs-extra": "^9.0.11",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^16.3.3",
+    "@types/sinon": "^10.0.13",
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "@typescript-eslint/parser": "^4.14.1",
+    "brighterscript": "0.61.2",
+    "roku-log-bsc-plugin": "^0.7.0",
+    "ropm": "0.10.5",
+    "maestro-roku-bsc-plugin": "^0.25.7",
+    "rooibos-roku": "^5.3.5",
+    "roku-deploy": "3.7.0",
+    "ts-node": "^10.1.0",
+    "typescript": "4.2.4"
   },
   "repository": {
     "type": "git",
@@ -43,14 +52,18 @@
   },
   "ropm": {
     "rootDir": "src",
-    "packageRootDir": "dist"
+    "packageRootDir": "dist",
+    "noprefix": [
+      "maestro"
+    ]
   },
   "scripts": {
-    "install-local": "node scripts/install-local.js",
-    "install-pull-local": "node scripts/install-local.js --pull",
-    "uninstall-local": "node scripts/uninstall-local.js",
-    "build-dev": "npx bsc --project bsconfig-dev.json",
-    "build-prod": "npx bsc --project bsconfig-prod.json",
-    "build-test": "cd tests && ropm install && cd .. && bsc --project bsconfig-test.json"
+    "update-schema": "npm run build && cd build && npx scenegraph-schema -o ../.vscode/project.xsd",
+    "_postinstall": "npx ropm copy",
+    "build": "node scripts/run.js && npx ts-node scripts/cleanup-build.js",
+    "build-test": "node scripts/run-test.js",
+    "build-sample-app": "node scripts/run-sample-app.js",
+    "lint": "npx bsc"
+
   }
 }

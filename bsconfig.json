@@ -1,46 +1,19 @@
 {
-  "stagingFolderPath": "/tmp/out",
   "rootDir": "src",
-  "files": [
-    "manifest",
-    "source/**/*.*",
-    "components/**/*.*"
-  ],
+  "files": ["manifest", "source/**/*.*", "components/**/*.*", "!**/*.spec.*"],
   "autoImportComponentScript": true,
   "createPackage": false,
+  "stagingFolderPath": "dist",
   "diagnosticFilters": [
     {
       "src": "**/roku_modules/**/*.*"
     },
-    {
-      "src": "**/WhiteList.xml",
-      "codes": [
-        1067
-      ]
-    }
+    1120
   ],
-  "plugins": [
-    "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
-  ],
-  "ignore": [
-    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js"
-  ],
-  "rooibos": {
-    "isRecordingCodeCoverage": false,
-    "testsFilePattern": null
-  },
+  "emitDefinitions": true,
+  "plugins": ["maestro-roku-bsc-plugin"],
+  "sourceMap": true,
   "maestro": {
-    "buildTimeImports": {
-      "IAuthProvider": [],
-      "IEntitlementsProvider": [],
-      "IBookmarksProvider": [],
-      "IPlayerAnalytics": [],
-      "IAnalytics": []
-    }
-  },
-  "rokuLog": {
-    "strip": false,
-    "insertPkgPath": true
+    "excludeFilters": ["**/roku_modules/**/*", "**/rooibos-roku/**/*"]
   }
 }

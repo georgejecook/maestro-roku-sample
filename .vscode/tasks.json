@@ -4,10 +4,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build-dev",
+      "label": "build",
       "type": "shell",
-      "command": "npm run build-dev",
-      "problemMatcher": [],
+      "command": "npm run build",
       "presentation": {
         "echo": true,
         "reveal": "silent",
@@ -15,11 +14,7 @@
         "panel": "shared",
         "showReuseMessage": false,
         "clear": true
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
+      }
     },
     {
       "label": "build-test",
@@ -37,12 +32,12 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      },
+      }
     },
     {
-      "label": "build-prod",
+      "label": "sample-app",
       "type": "shell",
-      "command": "npm run build-prod",
+      "command": "npm run build-sample-app",
       "problemMatcher": [],
       "presentation": {
         "echo": true,
@@ -55,7 +50,7 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      },
-    },
+      }
+    }
   ]
 }

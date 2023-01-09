@@ -53,5 +53,6 @@
     "**/build": true,
     "**/out": true
   },
+  "brightscript.bsdk": "node_modules/brighterscript",
 
 }

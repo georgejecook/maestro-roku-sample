@@ -7,48 +7,48 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "Run",
-      "stopOnEntry": false,
-      "preLaunchTask": "build-dev",
-      "envFile": "${workspaceFolder}/.vscode/.env",
-      "host": "${env:ROKU_DEV_TARGET}",
-      "password": "${env:ROKU_DEVPASSWORD}",
-      "rootDir": "${workspaceFolder}/build",
-      "sourceDirs": [
-        "${workspaceFolder}/src"
-      ],
-      "files": [
-        "manifest",
-        "source/**/*.*",
-        "components/**/*.*",
-        "images/**/*.*",
-        "font/**/*.*",
-        "!*.zip",
-        "!**/*.zip"
-      ],
-    },
-    {
-      "type": "brightscript",
-      "request": "launch",
-      "name": "Tests",
+      "name": "Test",
       "stopOnEntry": false,
       "preLaunchTask": "build-test",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
       "rootDir": "${workspaceFolder}/build",
-      "sourceDirs": [
-        "${workspaceFolder}/src"
-      ],
       "files": [
         "manifest",
-        "source/**/*.*",
-        "components/**/*.*",
-        "images/**/*.*",
-        "font/**/*.*",
+        "*.*",
+        "**/*.*",
+        "!images/**/*.*",
         "!*.zip",
         "!**/*.zip"
       ],
+      "enableDebugProtocol": false
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "Sample App",
+      "preLaunchTask": "sample-app",
+      "internalConsoleOptions": "neverOpen",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "outDir": "${workspaceFolder}/out",
+      "rootDir": "${workspaceFolder}/build",
+      "consoleOutput": "normal",
+      "stopOnEntry": false,
+      "retainDeploymentArchive": true,
+      "retainStagingFolder": true,
+    //   "autoRunSgDebugCommands": ["chanperf", "fpsdisplay", "logrendezvous"],
+      "autoRunSgDebugCommands": [],
+      "files": [
+        "manifest",
+        "*.*",
+        "**/*.*",
+        "!*.zip",
+        "!**/*.zip"
+      ]
     }
+
   ]
 }
