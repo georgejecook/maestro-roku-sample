@@ -95,14 +95,17 @@ class ModuleScreen extends mv.BaseScreen
     listSettings.numberItemsToRenderBefore = 5
 
     content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
-    content@.setNotificationsEnabled(false)
 
-    ' items = m.createHeaderOnlyData()
+    items = m.createHeaderOnlyData()
     timer.log("makeData")
     m.setFocus(m.loadingIndicator)
-    ' content@.appendChildren(items)
+
+    content@.appendChildren(items)
+    content@.setNotificationsEnabled(false)
+
     m.list.visible = false
     m.list@.setContent(content)
+
     m.content = content
     timer.log("set content")
     if m.list.state = "rendered"
@@ -134,7 +137,7 @@ class ModuleScreen extends mv.BaseScreen
     numItems = 5
     row0FocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
     row0FocusSettings.feedbackStyle = "none"
-    cellSettings = ml.listMixin.createCellSettings("HeroCell", [1100, 700], 30)
+    cellSettings = ml.listMixin.createCellSettings("HeroCellEfficient", [1100, 700], 30)
     row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
     row.settings.headerSettings.position = "none"
     row.settings.contentOffset = [400, -30]
@@ -328,7 +331,7 @@ class ModuleScreen extends mv.BaseScreen
 
     m.list.content@.setNotificationsEnabled(false)
 
-    m.list.content@.insertChildren(newModules, 0)
+    m.list.content@.insertChildren(newModules, 1)
     m.list.content@.setNotificationsEnabled(true)
     m.list@.synchronizeContent()
   end function
@@ -443,13 +446,6 @@ class ModuleScreen extends mv.BaseScreen
     return true
   end function
 
-  protected override function onKeyPressBack() as boolean
-    if m.top.isRoot <> true
-      m.list.isHidden = true
-      m.pop()
-    end if
-    return true
-  end function
 
   private function onKeyPressUp() as boolean
     ? "FOCUS ON BUTTON"
