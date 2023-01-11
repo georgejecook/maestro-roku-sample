@@ -133,7 +133,7 @@ class ListScreen extends mv.BaseScreen
         row.settings.screenPos = -1
       else if useComplexRow and (i = 3 or i = 8 or i = 14)
         complexFocusSettings = ml.listMixin.createFocusSettings(m.scrollSpeed)
-        row.settings = ml.listMixin.createCustomRowSettings("ComplexRow", 700)
+        row.settings = ml.listMixin.createCustomRowSettings("ComplexRowEfficient", 700)
 
       else if useGrids and (i = 2 or i = 3 or i = 4 or i = 6 or i = 9)
         gridFocusSettings = ml.listMixin.createFocusSettings("floating", [0, 0, 0, 0])

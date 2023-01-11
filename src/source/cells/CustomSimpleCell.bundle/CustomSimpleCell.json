@@ -1,0 +1,65 @@
+{
+  "views": [
+    {
+      "id": "group",
+      "_type": "Group",
+      "translation": [0, 0],
+      "scaleRotateCenter": [150, 200],
+      "size": [300, 400],
+      "_children": [
+        {
+          "id": "poster",
+          "_type": "mv_Poster",
+          "size": [300, 400],
+          "translation": [0, 0],
+          "loadSync": false,
+          "loadDisplayMode": "scaleToFit",
+          "loadWidth": 307,
+          "loadHeight": 100,
+          "failedBitmapUri": "http://via.placeholder.com/300x400"
+        },
+        {
+          "id": "overlay",
+          "_type": "mv_Rectangle",
+          "translation": [0, 0],
+          "size": [300, 400],
+          "color": "#000000",
+          "opacity": 0.5
+        }
+      ]
+    },
+
+    {
+      "id": "label",
+      "_type": "mv_Label",
+      "translation": [30, 300],
+      "size": [300, 100],
+      "fontKey": "medium,24",
+      "color": "#ffffff"
+    }
+  ],
+  "styles": {
+    "normal": [
+      {
+        "id": "label",
+        "fontKey": "medium,24",
+        "color": "#ffffff"
+      },
+      {
+        "id": "overlay",
+        "visible": true
+      }
+    ],
+    "highlighted": [
+      {
+        "id": "label",
+        "fontKey": "mediumBold,24",
+        "color": "#ffffff"
+      },
+      {
+        "id": "overlay",
+        "visible": false
+      }
+    ]
+  }
+}

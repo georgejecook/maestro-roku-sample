@@ -7,7 +7,7 @@ import "pkg:/source/roku_modules/maestro/ml/ItemFocusManager.brs"
 
 
 @node("ComplexRowEfficient", "ml_BaseRow")
-class ComplextRowEfficient extends ml.BaseRow
+class ComplexRowEfficient extends ml.BaseRow
 
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

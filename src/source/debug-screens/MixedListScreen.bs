@@ -4,12 +4,8 @@ import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
 
 
-@node("DisneyHeroScreen", "mv_BaseScreen")
-class DisneyHeroScreen extends mv.BaseScreen
-
-  @observer("onRemoveItems")
-  @alwaysnotify
-  public removeItems = 0
+@node("MixedListScreen", "mv_BaseScreen")
+class MixedListScreen extends mv.BaseScreen
 
   'views
   private list
@@ -18,7 +14,7 @@ class DisneyHeroScreen extends mv.BaseScreen
 
   'style
   private numberOfRows = 20
-  private defaultCellType = "ml_SimpleCell"
+  private defaultCellType = "CustomSimpleCell"
 
   'state
   public componentPool as mc.types.node
@@ -30,7 +26,7 @@ class DisneyHeroScreen extends mv.BaseScreen
   private scrollSpeed = 2
 
   function new()
-    super("DisneyHeroScreen")
+    super("MixedListScreen")
   end function
 
   protected override function initialize()
@@ -63,18 +59,21 @@ class DisneyHeroScreen extends mv.BaseScreen
 
   private function onResetChange()
     m.list.content = invalid
-    m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [320, 130], 30)
+    m.cellSettings = ml.listMixin.createCellSettings("CustomSimpleCell", [300, 400], 10)
 
     timer = new mc.utils.DebugTimer("list")
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30)
 
-    m.focusSettings = ml.listMixin.createFocusSettings("fixed", [-50, -50, 50, 50])
-    ' listSettings = ml.listMixin.createListSettings(3000, 3000)
+    m.focusSettings = ml.listMixin.createFocusSettings("fixed")
+    m.focusSettings.feedbackStyle = "none"
+
     listSettings = ml.listMixin.createListSettings()
-    ' listSettings.rowCreationStrategy = "all"
     listSettings.rowCreationStrategy = "async"
     listSettings.rowCreationBatchSize = 5
     listSettings.rowCreationBatchDelay = 0.3
+    listSettings.numberItemsToRenderAfter = 10
+    listSettings.numberItemsToRenderBefore = 10
+    listSettings.renderStrategy = "dynamic"
 
     content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
     items = m.createGridData()
@@ -106,45 +105,23 @@ class DisneyHeroScreen extends mv.BaseScreen
 
   private function createGridData()
     content = []
-    ' rowFocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
-    rowFocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
-    showHero = true
+    prefix = ""
 
-    useGrids = false
-
-    'TODO - add normal rows around this
-    ' for i = 0 to 1
-    for i = 0 to 20
+    for i = 0 to 10
       row = createObject("roSGNode", "ml_RowContent")
       row.id = rnd(2147483647).toStr()
       numItems = 5
-      if showHero and (i = 0 or i = 2)
-        numItems = 20
-        row0FocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
-        if i <> 10
-          row0FocusSettings.feedbackStyle = "none"
-        end if
-        cellSettings = ml.listMixin.createCellSettings("DisneyHeroCell", [1400, 850], 30)
-        row.settings = ml.listMixin.createRowSettings(cellSettings, row0FocusSettings)
-        row.settings.headerSettings.position = "none"
-        row.settings.contentOffset = [400, -30]
-        prefix = "HERO"
-        row.settings.screenPos = -1 ' -1
-      else if false and (i = 3 or i = 8 or i = 14)
+      if i = 3
         row.settings = ml.listMixin.createCustomRowSettings("ComplexRowEfficient", 700)
+        row.settings.headerSettings.labelOffset = [30, 0]
+        row.settings.contentOffset = [30, 200]
+      else if i = 2 or i = 4
+        gridFocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
+        gridFocusSettings.feedbackStyle = "none"
 
-      else if useGrids and (i = 2 or i = 3 or i = 4 or i = 6 or i = 9)
-        gridFocusSettings = ml.listMixin.createFocusSettings("floating", [0, 0, 0, 0])
-        if i = -2
-          numCols = 1
-        else
-          numCols = 4
-        end if
-
-        row.settings = ml.listMixin.createGridRowSettings(m.cellSettings, gridFocusSettings, 30, invalid, 150, numCols, 100, 5, 50)
+        row.settings = ml.listMixin.createGridRowSettings(m.cellSettings, gridFocusSettings, 30, invalid, 150, 5, 400, 5, 50)
         row.settings.contentOffset = [100, 30]
         prefix = "GRID"
-        ' row.settings.peekNextPixels = 300
         if i = 3
           numItems = 8
         else
@@ -153,77 +130,68 @@ class DisneyHeroScreen extends mv.BaseScreen
 
       else
         focusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
-        ' focusSettings = ml.listMixin.createFocusSettings("floating", [0, 0, 0, 0])
+        focusSettings.feedbackStyle = "top"
         row.settings = ml.listMixin.createRowSettings(m.cellSettings, focusSettings)
         row.settings.contentOffset = [100, 30]
         prefix = "HORIZ"
-        ' row.settings.peekNextPixels = 300
         row.settings.screenPos = -1 ' -1
-        if i = 1 or i = 19
+        if i = 1
           row.settings.screenPos = -1 ' 800
-        else if i = 5 or i = 15
-          row.settings.screenPos = -1 ' 600
-        else if i = 3 or i = 7
-          row.settings.screenPos = -1 ' 200
-        else if i = 13
-          row.settings.screenPos = -1 ' 50
+          row.settings.headerSettings.labelOffset = [200, 0]
+          row.settings.headerSettings.textColor = "#adf333"
+          row.settings.contentOffset = [200, 30]
         end if
         numItems = 5
       end if
       row.title = "ROW " + str(i)
-      ' row.settings.screenPos =-1 ' 400
       content.push(row)
-      row@.appendChildren(m.makeItems(m.defaultCellType, numItems, "HORIZ"))
+      row@.appendChildren(m.makeItems(numItems, prefix))
     end for
 
     return content
   end function
 
-  private function makeItems(cellType as string, number as integer, prefix = "Item" as string)
+  private function makeItems(number as integer, prefix = "Item" as string)
     items = []
     for i = 0 to number - 1
-      items.push(m.makeItem(cellType, `${prefix} ${m.contentId} [${i}]`))
+      items.push(m.makeItem(`${prefix} ${m.contentId} [${i}]`))
     end for
     return items
   end function
 
-  private function makeItem(cellType as string, title as string) as mc.types.node
+  private function makeItem(title as string) as mc.types.node
     id = rnd(2147483647).toStr()
     child = m.createSGNode("Item", invalid, id, {
       json: {
         title: title
         description: "some really long " + id + "text in here " + id
-        posterUrl: "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340"
+        posterUrl: "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/300/400"
+
       }
     })
-
-    child.description = "some really long " + id + "text in here " + id
-    child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340"
-    child.title = title
+    child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/300/400"
     m.contentId++
     return child
-  end function
-
-  private function onRemoveItems(numItems as integer)
-    row = m.list.content@.getChild(m.list.focusedRowIndex)
-    startIndex = row.length - numItems
-    row@.removeChildrenIndex(startIndex, numItems)
   end function
 
   private function addRow(index as integer)
     rowFocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
     row = createObject("roSGNode", "ml_RowContent")
+    row@.setNotificationsEnabled(false)
+
     rowFocusSettings.feedbackColor = "#F4D42A"
     headerSettings = ml.listMixin.createHeaderSettings([30, 20], 80, "mediumBold,50", "#ffff00")
-    cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [320, 200], 100)
+    cellSettings = ml.listMixin.createCellSettings("PosterCellEfficient", [400, 250], 100)
     row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings, 30, headerSettings)
     row.settings.contentOffset = [100, 0]
 
     row.title = "NEW ROW " + m.contentId.toStr()
     row.id = rnd(2147483647).toStr()
     m.contentId++
-    row@.appendChildren(m.makeItems(m.defaultCellType, 5))
+    row@.appendChildren(m.makeItems(5))
+
     m.list.content@.insertChild(row, index)
+    m.list.content@.notifyUpdate()
     m.list@.synchronizeContent()
   end function
 
@@ -237,8 +205,8 @@ class DisneyHeroScreen extends mv.BaseScreen
 
     rowContent@.setNotificationsEnabled(false)
 
-    rowContent@.appendChildren(m.makeItems(m.defaultCellType, 1))
-    rowContent@.insertChild(m.makeItems(m.defaultCellType, 1), m.list.focusedCellIndex)
+    rowContent@.appendChildren(m.makeItems(1))
+    rowContent@.insertChild(m.makeItems(1), m.list.focusedCellIndex)
 
     rowContent@.setNotificationsEnabled(true)
     m.list.content@.notifyUpdate()
@@ -259,9 +227,7 @@ class DisneyHeroScreen extends mv.BaseScreen
 
   private function changeContent()
     m.list.content = invalid
-    ' m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [480, 50], 30)
-    ' m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [320, 250], 30)
-    m.cellSettings = ml.listMixin.createCellSettings("ml_SimpleCell", [320, 130], 30)
+    m.cellSettings = ml.listMixin.createCellSettings("CustomSimpleCell", [320, 130], 30)
 
     timer = new mc.utils.DebugTimer("list")
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, invalid, 30)
@@ -319,9 +285,20 @@ class DisneyHeroScreen extends mv.BaseScreen
     return true
   end function
 
+
+  private function onKeyPressReplay() as boolean
+    m.removeRow(1)
+    return true
+  end function
+
   private function onKeyPressFastForward() as boolean
     ' m.addRow(1)
     m.addCell()
+    return true
+  end function
+
+  private function onKeyPressPlay() as boolean
+    m.addRow(1)
     return true
   end function
 
@@ -444,7 +421,7 @@ class DisneyHeroScreen extends mv.BaseScreen
     ' ? ">>>onItemSelected changed to:" ; rowIndex ; "," ; event.cellIndex
     rowContent = m.list.content@.getChild(event.rowIndex)
     title = `NEW Item ${m.contentId}`
-    child = m.makeItem("SimpleCell", title)
+    child = m.makeItem("CustomSimpleCell", title)
     rowContent@.insertChild(child, event.cellIndex)
     ' rowContent@.removeChild(child)
     row = m.list@.getRowRenderer(event.rowIndex)

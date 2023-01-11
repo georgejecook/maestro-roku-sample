@@ -204,8 +204,6 @@ class UpdateListDataScreen extends mv.BaseScreen
       m.log.info("is using grids")
       gridFocusSettings = ml.listMixin.createFocusSettings("floating", [0, 0, 0, 0])
       row.settings = ml.listMixin.createGridRowSettings(m.cellSettings, gridFocusSettings, 30, invalid, 310, numCols, 100, 5, 50)
-      row.firstRowScreenPos = 330
-      row.otherRowScreenPos = 70
     else
       m.log.info("is using rows")
       rowFocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
@@ -244,6 +242,7 @@ class UpdateListDataScreen extends mv.BaseScreen
   end function
 
   private function makeSomeCoolRows()
+    m.log.info("make some cool rows")
     modules = []
     'ensure that row offsets are applied correctly
     for i = 0 to 5
@@ -257,6 +256,7 @@ class UpdateListDataScreen extends mv.BaseScreen
 
     m.list.content@.appendChildren(modules)
     m.list.content@.notifyUpdate()
+    m.list@.synchronizeContent()
 
   end function
 
@@ -292,7 +292,6 @@ class UpdateListDataScreen extends mv.BaseScreen
       if module.length > 0
         if numModules > 0 and module.settings.subType() = "ml_GridRowSettings"
           settings = module.settings.clone(true)
-          settings.firstRowScreenPos = settings.otherRowScreenPos
           module.settings = settings
         end if
         newModules.push(module)
@@ -428,6 +427,7 @@ class UpdateListDataScreen extends mv.BaseScreen
   end function
 
   private function onKeyPressOptions() as boolean
+    m.log.info("onKeyPressOptions")
     m.makeSomeCoolRows()
     return true
   end function

@@ -18,6 +18,7 @@ class VideoRow extends ml.BaseRow
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   protected override function createViews()
+
     bundle = m.styleManager@.loadBundle("pkg:/source/rows/VideoRow.bundle")
     m.createViewsFromStyleJson(bundle.views)
   end function
@@ -35,4 +36,14 @@ class VideoRow extends ml.BaseRow
     return ml.createFocusIndicatorConfig(m.top, invalid, direction)
   end function
 
+
+  private function onDidLoseFocus(event as ml.ListEvent)
+    m.video.control = "stop"
+  end function
+
+  private function onDidGainFocus(event as ml.ListEvent)
+    if m.video.state <> "stooped"
+      m.video.control = "play"
+    end if
+  end function
 end class

@@ -164,7 +164,7 @@ class ModuleScreen extends mv.BaseScreen
     row.otherRowScreenPos = 70
 
     row.settings.contentOffset = [100, 30]
-    numItems = 2
+    numItems = 7
     row.title = title
     row@.appendChildren(m.makeItems(m.defaultCellType, numItems))
     return row

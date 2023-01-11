@@ -85,6 +85,7 @@ class PosterCellEfficient extends ml.BaseCell
     end if
     if isGaining
       scale = 1 + (0.1 * fraction)
+      ' m.row.content.settings.focusSettings.feedbackOffsets = [-20, -12.5, 20, 12.5]
     else
       scale = 1 + (0.1 - (0.1 * fraction))
     end if
