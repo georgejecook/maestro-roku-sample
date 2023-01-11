@@ -73,6 +73,11 @@ class AnimationScreen extends mv.BaseScreen
   end function
 
   private function createViews()
+    bgRect = mc.createSGNode("mv_Rectangle", m.top, "bgRect", {
+      size: [1920, 1080]
+      color: "#bebebe"
+      translation: [0, 0]
+    })
     m.createViewsFromStyleJson(m.viewJson, m.top)
 
     redButtonStyle = m.styleManager@.getStyle("mv.Button.default")
