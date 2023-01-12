@@ -3,28 +3,30 @@
     {
       "id": "group",
       "_type": "Group",
+      "scaleRotateCenter": [280, 125],
       "translation": [0, 0],
-      "scaleRotateCenter": [150, 200],
-      "size": [300, 400],
       "_children": [
         {
           "id": "poster",
           "_type": "mv_Poster",
-          "size": [300, 400],
+          "size": [560, 250],
           "translation": [0, 0],
           "loadSync": false,
-          "loadDisplayMode": "scaleToFit",
-          "loadWidth": 307,
-          "loadHeight": 100,
-          "failedBitmapUri": "http://via.placeholder.com/300x400"
+          "loadDisplayMode": "limitSize",
+          "loadWidth": 560,
+          "loadHeight": 250,
+          "failedBitmapUri": "http://via.placeholder.com/560x250"
         },
         {
           "id": "overlay",
-          "_type": "mv_Rectangle",
+          "_type": "mv_Poster",
+          "size": [560, 250],
           "translation": [0, 0],
-          "size": [300, 400],
-          "color": "#000000",
-          "opacity": 0.5
+          "loadSync": false,
+          "loadDisplayMode": "scaleToFill",
+          "loadWidth": 560,
+          "loadHeight": 250,
+          "uri": "pkg:/images/overlays/overlay.png"
         }
       ]
     },
@@ -32,8 +34,8 @@
     {
       "id": "label",
       "_type": "mv_Label",
-      "translation": [30, 300],
-      "size": [300, 100],
+      "translation": [50, 190],
+      "size": [560, 100],
       "fontKey": "medium,24",
       "color": "#ffffff"
     }
@@ -42,8 +44,7 @@
     "normal": [
       {
         "id": "label",
-        "fontKey": "medium,24",
-        "color": "#ffffff"
+        "fontKey": "medium,24"
       },
       {
         "id": "overlay",
@@ -53,8 +54,7 @@
     "highlighted": [
       {
         "id": "label",
-        "fontKey": "mediumBold,24",
-        "color": "#ffffff"
+        "fontKey": "mediumBold,24"
       },
       {
         "id": "overlay",

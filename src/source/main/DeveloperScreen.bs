@@ -48,6 +48,7 @@ namespace main
     end function
     protected function getPage2()
       return [
+        ["Home screen sample ", function(): m.showScreen(m.createSGNode("HomeScreen")): end function]
         ["Disney Inspired Hero ", function(): m.showScreen(m.createSGNode("DisneyHeroScreen")): end function]
         ["List OnEnterOnExit", function(): m.showScreen(m.createSGNode("ListEnterExitScreen")): end function]
         ["List ", function(): m.showScreen(m.createSGNode("ListScreen")): end function]
