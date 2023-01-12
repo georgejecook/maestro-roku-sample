@@ -1,0 +1,144 @@
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/roku_modules/maestro/core/MIOC.brs"
+import "pkg:/source/rooibos/Utils.bs"
+import "pkg:/source/rooibos/BaseTestSuite.bs"
+
+namespace tests
+
+  class BaseTestSuite extends rooibos.BaseTestSuite
+    private styleManager
+    private appController
+    private log
+
+    protected override function setup()
+      'bs:disable-next-line
+      tests.setUpMScope()
+      m.log = new log.Logger(m.name)
+    end function
+
+    protected override function beforeEach()
+      mioc.createContainer()
+      m.styleManager = createObject("roSGNode", "mv_StyleManager")
+      mioc.setInstance("styleManager", m.styleManager)
+
+      m.appController = { "id": "appController" }
+      mioc.setInstance("appController", m.appController)
+      if m.global.testStyleManager = invalid
+        m.getConfiguredStyleManager()
+      end if
+
+      if m.global.sharedDate = invalid
+        sharedDate = mc.createSGNode("robot_Date")
+        mc.setOrAddNodeField(m.global, "sharedDate", sharedDate)
+        mioc.setInstance("sharedDate", sharedDate)
+        nowDate = mc.createSGNode("robot_Date")
+        mc.setOrAddNodeField(m.global, "nowDate", nowDate)
+        mioc.setInstance("nowDate", nowDate)
+      end if
+    end function
+
+    protected override function afterEach()
+      mioc.reset()
+      mioc.clearClassInstances()
+      if m.global.__mioc <> invalid
+        m.global.__mioc = invalid
+      end if
+
+    end function
+
+    protected override function createNodeClass(clazz, useClassAsTop = true, nodeTop = new rooibos.utils.MockNode("top"), nodeGlobal = new rooibos.utils.MockNode("top"))
+      'bs:disable-next-line
+      instance = tests_maestro_nodeClassUtils_createNodeClass(clazz, nodeTop, nodeGlobal)
+      if instance <> invalid and useClassAsTop
+        'note - we use the clazz itself as TOP, so that we don't have to write tests that do
+        'thing.top.value, thing.top.value2, etc all over the place
+        instance.append(nodeTop)
+        instance.top = instance
+        instance.__rooibosSkipFields = { "top": true }
+      end if
+      return instance
+    end function
+
+    ' Util method to simplify setting up a test for using the Api task
+    ' allows for passing in specific appConfig, manifest and itemStore
+    ' if those params are invalid, then sensible defaults are created
+    protected function configureIOCForApiTask(appConfig = invalid as mc.types.assocarray, manifest = invalid as mc.types.assocarray, itemStore = invalid as mc.types.assocarray, user = invalid as mc.types.node)
+      if appConfig = invalid
+        '/* cspell:disable */
+        appConfig = {
+        }
+        '/* cspell:enable */
+      end if
+      mioc.setInstance("appConfig", appConfig)
+      if manifest = invalid
+        manifest = {
+          version_number: "1"
+        }
+      end if
+      mioc.setInstance("manifest", manifest)
+
+      if user = invalid
+        ' user = mc.createSGNode("User", invalid, "user")
+      end if
+      mioc.setInstance("user", user)
+
+      if itemStore = invalid
+        ' itemStore = mc.createSGNode("ItemStore", invalid, "itemStore")
+      end if
+
+      mioc.setInstance("itemStore", itemStore)
+    end function
+
+    function getConfiguredStyleManager()
+      styleUrl = "pkg:/meta/Styles.json"
+      m.log.info("loading styles from", styleUrl)
+
+      if m.global.testStyleManager = invalid
+        styleManager = mc.createSGNode("mv_StyleManager", invalid, "styleManager")
+        mioc.setInstance("styleManager", styleManager)
+        mc.setOrAddNodeField(m.global, "styleManager", styleManager)
+        mc.setOrAddNodeField(m.global, "testStyleManager", styleManager)
+
+        styleJson = m.loadJson(styleUrl)
+        styleManager@.setStyleJson(styleJson)
+      end if
+      return m.global.testStyleManager
+    end function
+
+    protected function loadJson(path as string) as mc.types.assocarray
+      text = readAsciiFile(path)
+      return text = invalid ? invalid : parseJson(text)
+    end function
+
+    protected function setIOCPath(name as string, path as string, value as dynamic)
+      ' mioc.setInstance(name, mc.createPath(path, value))
+    end function
+
+    protected function assertErrorEqual(error as mc.Error, otherError as mc.Error)
+      if error.code <> otherError.code
+        m.fail(`expected error code ${error.code} got ${otherError.code}`)
+      end if
+      if error.message <> otherError.message
+        m.fail(`expected error code ${error.message} got ${otherError.message}`)
+      end if
+    end function
+
+    protected function createMockRobotViews(instance as dynamic, robotPath as string)
+      json = m.loadJson("pkg:/meta/robot.json")
+      'bs:disable-next-line
+      ids = mv_getIdsFromStyleJson(mc_getArray(json, robotPath))
+      for each id in ids
+        instance[id] = { id: id }
+      end for
+    end function
+  end class
+
+  function setUpMScope()
+    log.initializeLogManager(["log_PrintTransport"], 2)
+    m.global.rLog.includeFilters = []
+    m.global.rLog.excludeFilters = []
+
+    m.log = new log.Logger("rooibosScope")
+  end function
+
+end namespace

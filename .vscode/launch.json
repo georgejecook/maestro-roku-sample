@@ -7,48 +7,50 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "Test",
+      "name": "DEV",
+      "stopOnEntry": false,
+      "preLaunchTask": "build-dev",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "rootDir": "${workspaceFolder}/build",
+      "files": ["*", "*.*", "**/*.*"]
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "PROD",
+      "stopOnEntry": false,
+      "preLaunchTask": "build-prod",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "rootDir": "${workspaceFolder}/build",
+      "files": ["*", "*.*", "**/*.*"]
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "TEST",
       "stopOnEntry": false,
       "preLaunchTask": "build-test",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
       "rootDir": "${workspaceFolder}/build",
-      "files": [
-        "manifest",
-        "*.*",
-        "**/*.*",
-        "!images/**/*.*",
-        "!*.zip",
-        "!**/*.zip"
-      ],
-      "enableDebugProtocol": false
+      "files": ["*", "*.*", "**/*.*"]
     },
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "Sample App",
-      "preLaunchTask": "sample-app",
-      "internalConsoleOptions": "neverOpen",
+      "name": "OPEN TEST FILES",
+      "stopOnEntry": false,
+      "preLaunchTask": "build-tdd",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
-      "outDir": "${workspaceFolder}/out",
       "rootDir": "${workspaceFolder}/build",
-      "consoleOutput": "normal",
-      "stopOnEntry": false,
-      "retainDeploymentArchive": true,
-      "retainStagingFolder": true,
-    //   "autoRunSgDebugCommands": ["chanperf", "fpsdisplay", "logrendezvous"],
-      "autoRunSgDebugCommands": [],
-      "files": [
-        "manifest",
-        "*.*",
-        "**/*.*",
-        "!*.zip",
-        "!**/*.zip"
-      ]
+      "files": ["*", "*.*", "**/*.*"]
     }
-
   ]
 }
