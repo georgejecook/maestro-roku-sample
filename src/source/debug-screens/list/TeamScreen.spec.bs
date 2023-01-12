@@ -24,6 +24,9 @@ namespace tests
       listHolder = { "id": "listHolder" }
       list = { "id": "list" }
 
+      m.screen.list = list
+      m.screen.listHolder = listHolder
+
       m.expectCalled(m.screen.createSGNode("mv_Rectangle", m.top, "bgRect", {
         translation: [0, 0]
         size: [1920, 1080]
@@ -31,11 +34,13 @@ namespace tests
       }), rectangle)
 
       m.expectCalled(m.screen.createSGNode("Group", m.top, "listHolder"), listHolder)
-      m.expectCalled(m.screen.createSGNode("ml_List", listHolder, "list", {
+      m.expectCalled(m.screen.createSGNode("ml_List", m.screen.listHolder, "list", {
         translation: [0, 0]
         width: 1920
         height: 1080
       }), list)
+
+      m.expectCalled(m.screen.setInstance("list", m.screen.list))
 
       m.expectCalled(m.screen.createSGNode("LoadingIndicator", m.top, "loadingIndicator", {
         isActive: true
