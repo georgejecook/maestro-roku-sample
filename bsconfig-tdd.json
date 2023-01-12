@@ -1,22 +1,36 @@
 {
   "extends": "bsconfig.json",
-  "files": ["manifest", "source/**/*.*", "meta/**/*.*", "components/**/*.*"],
+  "files": [
+    "manifest",
+    "source/**/*.*",
+    "meta/**/*.*",
+    "components/**/*.*",
+    "!**/images/**/*.*",
+    "**/BaseTest*.spec.bs",
+    "**/START",
+    "source/debug-screens/list/TeamScreen.spec.bs",
+    "source/tests/BaseTestSuite.spec.bs",
+    "**/END"
+  ],
+
   "plugins": ["roku-log-bsc-plugin", "maestro-roku-bsc-plugin", "rooibos-roku"],
   "rooibos": {
     "isRecordingCodeCoverage": false,
     "testsFilePattern": null,
     "tags": ["!integration", "!deprecated", "!fixme", "!tbd"],
     "showOnlyFailures": true,
-    "catchCrashes": true,
+    "catchCrashes": false,
     "lineWidth": 70,
     "sendHomeOnFinish": false,
-    "failFast": false
+    "failFast": false,
+    "enableAdvancedExpectSyntax": true
   },
   "maestro": {
     "excludeFilters": [
       "**/RALETrackerTask.*",
       "**/roku_modules/**/*",
-      "**/node_modules/**/*"
+      "**/node_modules/**/*",
+      "**/rooibos/**/*"
     ],
     "nodeClasses": {
       "buildForIDE": false,

@@ -52,7 +52,7 @@ namespace ml.sample
         height: size[1]
       })
 
-      mioc.setInstance("list", m.list)
+      m.setInstance("list", m.list)
       m.loadingIndicator = m.createSGNode("LoadingIndicator", m.top, "loadingIndicator", {
         isActive: true
         width: 1920

@@ -3,7 +3,7 @@ import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
 import "pkg:/source/roku_modules/maestro/ml/RowItemScroller.brs"
 import "pkg:/source/roku_modules/maestro/ml/RowItemViewManager.brs"
 import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
-import "pkg:/source/roku_modules/maestro/view/BaseCell.brs"
+import "pkg:/source/roku_modules/maestro/ml/cells/BaseCell.brs"
 
 @node("SubHeroCell", "ml_BaseCell")
 class SubHeroCell extends ml.BaseCell

@@ -1,4 +1,4 @@
-import "pkg:/source/roku_modules/maestro/view/BaseCell.brs"
+import "pkg:/source/roku_modules/maestro/ml/cells/BaseCell.brs"
 import "pkg:/source/roku_modules/maestro/core/Utils.brs"
 import "pkg:/source/roku_modules/maestro/view/Animation.brs"
 

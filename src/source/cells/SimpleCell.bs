@@ -1,4 +1,4 @@
-import "pkg:/source/roku_modules/maestro/view/BaseCell.brs"
+import "pkg:/source/roku_modules/maestro/ml/cells/BaseCell.brs"
 namespace sample
   @node("SimpleCell", "ml_BaseCell")
   class SimpleCell extends ml.BaseCell
