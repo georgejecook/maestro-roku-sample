@@ -1,0 +1,120 @@
+{
+  "views": [
+    {
+      "id": "backgroundRectangle",
+      "_type": "mv_Rectangle",
+      "size": [1920, 1080],
+      "color": "~styles.colors.general.grey"
+    },
+    {
+      "id": "mainGroup",
+      "_type": "Group",
+      "translation": [0, 0],
+      "_children": [
+        {
+          "id": "backgroundPoster",
+          "_type": "mv_Poster",
+          "size": [1920, 800],
+          "translation": [0, 0],
+          "loadSync": true,
+          "loadDisplayMode": "limitSize",
+          "uri": ""
+        },
+        {
+          "id": "overlay",
+          "_type": "mv_Poster",
+          "size": [1200, 800],
+          "translation": [0, 0],
+          "loadSync": true,
+          "loadDisplayMode": "limitSize",
+          "uri": "pkg:/images/overlays/overlay-details-screen.png"
+        },
+        {
+          "id": "infoContainer",
+          "_type": "mv_LayoutGroup",
+          "translation": [90, 90],
+          "layoutDirection": "vert",
+          "vertAlignment": "top",
+          "horizAlignment": "left",
+          "itemSpacings": [30, 50],
+          "_children": [
+            {
+              "_type": "mv_Label",
+              "id": "titleLabel",
+              "translation": [0, 0],
+              "text": "Issac Asimov",
+              "color": "~styles.colors.general.white",
+
+              "fontKey": "~fonts.title-07",
+              "lineSpacing": 1,
+              "wrap": true,
+              "maxLines": 2,
+              "size": [1000, 0]
+            },
+
+            {
+              "id": "descriptionLabel",
+              "_type": "mv_Label",
+              "translation": [0, 180],
+              "fontKey": "~fonts.body-06",
+              "text": "Foundation and Empire",
+              "color": "~styles.colors.general.white",
+              "size": [1200, 0],
+              "wrap": true,
+              "maxLines": 8,
+              "lineSpacing": 1
+            },
+
+            {
+              "id": "buttonsGroup",
+              "_type": "mv_ControlsGroup",
+              "_initializeAfterCreatingChildren": true,
+              "itemSpacings": [40],
+              "layoutMode": "horiz",
+              "keyDirection": "horiz",
+              "_children": [
+                {
+                  "id": "playButton",
+                  "_type": "mv_Button",
+                  "iconStyle": "~styles.icons.play",
+                  "text": "Play",
+                  "autoSize": true,
+                  "iconPosition": "centerLeft",
+                  "size": [265, 88]
+                },
+
+                {
+                  "id": "favoriteButton",
+                  "_type": "mv_Button",
+                  "iconStyle": "~styles.icons.favorite",
+                  "iconPosition": "centerLeft",
+                  "text": "Add to favorites",
+                  "autoSize": true,
+                  "size": [265, 88]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "list",
+      "_type": "ml_List",
+      "translation": [40, 500],
+      "width": 1920,
+      "height": 1080,
+      "visible": true
+    },
+    {
+      "id": "loadingIndicator",
+      "_type": "LoadingIndicator",
+      "width": 1920,
+      "height": 1080,
+      "backgroundVisible": false,
+      "translation": [0, 0],
+      "text": "",
+      "isActive": true
+    }
+  ]
+}

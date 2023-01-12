@@ -28,6 +28,7 @@
     "title-04": "mediumBold,28",
     "title-05": "mediumBold,32",
     "title-06": "mediumBold,40",
+    "title-07": "mediumBold,48",
     "caption": "medium,12",
     "body-00": "medium,14",
     "body-01": "medium,16",
@@ -36,5 +37,33 @@
     "body-04": "medium,27",
     "body-05": "medium,32",
     "body-06": "medium,40"
+  },
+  "icons": {
+    "default": {
+      "normal": {
+        "blendColor": "~styles.colors.general.white",
+        "size": [32, 32],
+        "translation": [0, 0],
+        "uri": ""
+      },
+      "focused": {
+        "blendColor": "~styles.colors.general.white",
+        "size": [42, 42]
+      },
+      "selected": {
+        "blendColor": "~styles.colors.general.white",
+        "size": [42, 42]
+      }
+    },
+    "play": {
+      "$extends": "~styles.icons.default",
+      "uri": "pkg:/images/play-icon-$$RES$$.png",
+      "size": [40, 40]
+    },
+    "favorite": {
+      "$extends": "~styles.icons.default",
+      "uri": "pkg:/images/fav-icon.png",
+      "size": [40, 40]
+    }
   }
 }

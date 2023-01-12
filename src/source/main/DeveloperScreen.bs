@@ -5,9 +5,16 @@ namespace main
   class DeveloperScreen extends mv.debug.DeveloperScreen
 
     private views = []
+    private navMenu as mc.types.node
+    private currentMenuItem as mc.types.node
+    private tabController as mc.types.node
 
     protected override function initialize()
       super.initialize()
+
+      m.configureNavMenu()
+      m.tabController = m.createSGNode("mv_TabController", m.top, "tabController")
+      m.setInstance("appController", m.top)
 
     end function
 
@@ -60,6 +67,30 @@ namespace main
         ["Mixed list screen", function(): m.showScreen(m.createSGNode("MixedListScreen")): end function]
 
       ]
+    end function
+
+    private function configureNavMenu()
+      if m.navMenu = invalid
+        m.navMenu = m.createSGNode("TopMenu", m.top, "topMenu", {
+          observe: {
+            "selectedIndex": m.onMenuItemChange
+          }
+        })
+      end if
+      m.navMenu.visible = false
+      bundle = m.styleManager@.loadBundle("pkg:/source/main/view/TopMenu.bundle")
+      m.navMenu@.setItems(bundle.menuItems)
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    private function onMenuItemChange(index as integer)
+      m.log.info("selected tab item", index)
+      m.currentMenuItem = m.navMenu@.getItems()[index]
+      m.tabController@.changeCurrentItem(m.currentMenuItem)
+      m.setFocus(m.tabController)
     end function
 
   end class

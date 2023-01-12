@@ -23,6 +23,9 @@ class HomeScreen extends mv.BaseScreen
   private cellSettings
   private loadingIndicator
 
+  @inject("appController")
+  private appController
+
   function new()
     super("HomeScreen")
   end function
@@ -39,7 +42,7 @@ class HomeScreen extends mv.BaseScreen
     m.listHolder = m.createSGNode("Group", m.top, "listHolder")
 
     m.list = m.createSGNode("ml_List", m.listHolder, "list", {
-      translation: [50, 100]
+      translation: [50, 200]
       width: size[0]
       height: size[1]
     })
@@ -65,6 +68,7 @@ class HomeScreen extends mv.BaseScreen
     m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, m.focusSettings, 10, headerSettings, -1, "ml_HorizontalRow", 250)
     m.rowSettings.numberItemsToRenderBefore = 10
     m.rowSettings.numberItemsToRenderAfter = 10
+    m.rowSettings.screenPos = 300
 
     listSettings = m.createListSettings()
     content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
@@ -79,6 +83,8 @@ class HomeScreen extends mv.BaseScreen
     content@.appendChildren(items)
 
     m.list@.setContent(content)
+    m.list.delegate = m.top
+
     timer.log("set content")
     if m.list.state = "rendered"
       m.onListRenderState("rendered")
@@ -108,6 +114,7 @@ class HomeScreen extends mv.BaseScreen
 
   private function makeRows()
     content = []
+    content.push(m.makeHeroRow())
 
     for i = 0 to m.numberOfRows - 1
       row = createObject("roSGNode", "ml_RowContent")
@@ -122,26 +129,46 @@ class HomeScreen extends mv.BaseScreen
     return content
   end function
 
-  private function makeItems(number as integer)
+  private function makeItems(number as integer, size = [560, 250] as mc.types.array)
     items = []
     for i = 0 to number - 1
-      items.push(m.makeItem(`Item ${i}`))
+      items.push(m.makeItem(`Item ${i}`, size))
     end for
     return items
   end function
 
-  private function makeItem(title as string) as mc.types.node
+  private function makeItem(title as string, size = [560, 250] as mc.types.array) as mc.types.node
     id = rnd(2147483647).toStr()
     child = m.createSGNode("Item", invalid, id, {
       json: {
         title: title
-        description: "some really long " + id + "text in here " + id
-        posterUrl: "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/560/250"
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam lorem id ante feugiat fermentum. Proin mi erat, pretium at ante at, condimentum porta lacus. Proin hendrerit tincidunt risus blandit gravida. Duis imperdiet, nulla ut maximus viverra, magna nulla tristique diam, eget rhoncus eros sem quis magna. Quisque viverra ultricies sem ac dictum. Cras sit amet lectus eros. Duis lobortis ligula ac sapien pharetra imperdiet. Vestibulum dictum urna quis orci fermentum ultricies ac in orci."
+        posterUrl: "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + `/${size[0]}/${size[1]}`
 
       }
     })
+    child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + `/${size[0]}/${size[1]}`
     m.contentId++
     return child
+  end function
+
+  private function makeHeroRow()
+    row = createObject("roSGNode", "ml_RowContent")
+    row.id = "heroRow"
+
+    cellSettings = ml.listMixin.createCellSettings("HeroCellEfficient", [1100, 700], 5)
+
+    focusSettings = ml.listMixin.createFocusSettings("fixed")
+    focusSettings.feedbackStyle = "none"
+
+    rowSettings = ml.listMixin.createRowSettings(cellSettings, focusSettings, 10, invalid, -1, "ml_HorizontalRow", 700)
+    rowSettings.numberItemsToRenderBefore = 4
+    rowSettings.numberItemsToRenderAfter = 4
+
+    row.settings = rowSettings
+
+    row@.appendChildren(m.makeItems(6, [1100, 700]))
+    return row
   end function
 
 
@@ -150,9 +177,9 @@ class HomeScreen extends mv.BaseScreen
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   protected override function onShow()
+    m.log.info("onShow")
     super.onShow()
-    m.list.isHidden = false
-    m.setFocus(m.list)
+    m.appController@.setTopMenuVisible(true)
   end function
 
   protected override function onHide()
@@ -216,17 +243,21 @@ class HomeScreen extends mv.BaseScreen
   end function
 
   private function onItemSelected(event as ml.ListEvent)
-    rowContent = m.list.content@.getChild(event.rowIndex)
-    title = `NEW Item ${m.contentId}`
-    child = m.makeItem("CustomSimpleCell", title)
-    rowContent@.insertChild(child, event.cellIndex)
-    row = m.list@.getRowRenderer(event.rowIndex)
-    row@.forceUpdate()
+    m.log.info("onItemSelected", event.rowIndex, event.cellIndex)
 
+    item = m.list@.getItem(event.rowIndex, event.cellIndex)
+
+    m.log.info("Selected Item", mc.dv(item))
+    selection = m.createSelection(item, "display", "detailsScreen")
+
+    m.executeSelection(selection)
   end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Key Presses
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private function isCapturingAnyKeyPress(key as string, press as boolean) as boolean
-    return key <> "back"
+    return key <> "back" and key <> "up"
   end function
-
 end class

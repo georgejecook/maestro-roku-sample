@@ -8,8 +8,6 @@
     "!**/images/**/*.*",
     "**/BaseTest*.spec.bs",
     "**/START",
-    "source/debug-screens/list/TeamScreen.spec.bs",
-    "source/tests/BaseTestSuite.spec.bs",
     "**/END"
   ],
 

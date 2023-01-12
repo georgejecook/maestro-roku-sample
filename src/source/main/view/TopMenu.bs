@@ -1,0 +1,157 @@
+import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/roku_modules/maestro/view/Animation.brs"
+
+namespace sample.view
+  @node("TopMenu", "mv_BaseView")
+  class TopMenu extends mv.BaseView
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Public Fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    public focusedIndex = 0
+
+    @alwaysnotify
+    public selectedIndex = 0
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private menuGroup as mc.types.node
+    private buttonsGroup as mc.types.node
+    private bgRect as mc.types.node
+
+    private iconStyle as mc.types.assocarray
+
+    private menuItems = []
+
+    private logo as mc.types.node
+
+    private buttonSize = [350, 64]
+
+    private homeButtonSize = [80, 64]
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function new()
+      super("TopMenu")
+    end function
+
+    protected override function initialize() as void
+      super.initialize()
+
+      m.createViews()
+    end function
+
+    private function createViews()
+      json = m.styleManager@.loadBundle("pkg:/source/main/view/TopMenu.bundle")
+
+      m.createViewsFromStyleJson(json.views)
+
+      m.iconStyle = {
+
+        normal: {
+          uri: ""
+          size: [50, 50],
+        },
+        focused: {
+          uri: ""
+          size: [60, 60],
+        }
+      }
+
+      m.observe(m.buttonsGroup.focusedIndex, m.onMenuIndexChanged)
+      m.observe(m.buttonsGroup.selectedIndex, m.onMenuItemSelected)
+    end function
+
+    public function getItems()
+      return m.menuItems
+    end function
+
+    public function setItems(items as mc.types.array)
+      if items.count() > 0
+        isHomeSet = false
+        for each item in items
+          contentNode = m.createSGNode("ContentNode", invalid, `${item.id}-tab`)
+          mc.setOrAddNodeField(contentNode, "screenType", item.screen)
+
+          if item.id = "home"
+            iconPosition = "center"
+            size = m.homeButtonSize
+          else
+            iconPosition = "left"
+            size = m.buttonSize
+          end if
+
+          m.iconStyle.normal.uri = `pkg:/images/menu/${item.id}-icon.png`
+          m.iconStyle.focused.uri = `pkg:/images/menu/${item.id}-icon.png`
+
+          m.createSGNode("mv_Button", m.buttonsGroup, `${item.id}-button`, {
+            styleKey: "mv.Button.default",
+            size: size,
+            iconStyle: m.iconStyle
+            text: `${item.title}`,
+            iconPosition: iconPosition,
+            autoSize: true,
+            isSelected: not isHomeSet
+          })
+          m.menuItems.push(contentNode)
+          isHomeSet = true
+        end for
+        m.buttonsGroup@.updateChildren()
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Callbacks
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onMenuIndexChanged(index as integer) as void
+      m.log.info("focused button index", index)
+      m.focusedIndex = index
+    end function
+
+    private function onMenuItemSelected(index as integer) as void
+      m.selectedIndex = index
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Lifecycle
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function onGainedFocus(isSelfFocused as boolean)
+      super.onGainedFocus(isSelfFocused)
+      m.log.info("Menu gained focus")
+      if isSelfFocused
+        m.setFocus(m.buttonsGroup)
+        m.bgRect.opacity = 0.8
+      end if
+    end function
+
+    protected override function onLostFocus()
+      super.onLostFocus()
+      m.log.info("Menu lost focus")
+      m.bgRect.opacity = 0.4
+    end function
+
+    protected override function onShow()
+      m.log.info("On show")
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Key Presses
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onKeyPressDown() as boolean
+      m.log.info("On key press down")
+      if m.buttonsGroup.isFocused
+        m.onLostFocus()
+      end if
+      return false
+    end function
+
+  end class
+end namespace

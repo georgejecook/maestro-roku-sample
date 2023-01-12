@@ -1,6 +1,12 @@
 {
   "menuItems": [
     {
+      "id": "home",
+      "title": "HomeScreen",
+      "screen": "HomeScreen",
+      "isDefault": true
+    },
+    {
       "id": "buttons",
       "title": "Buttons",
       "screen": "ButtonScreen",

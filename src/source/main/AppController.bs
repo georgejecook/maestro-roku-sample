@@ -55,7 +55,7 @@ namespace mc.sample
       m.bundle = m.styleManager@.loadBundle("pkg:/source/main/AppController.bundle")
 
       m.createViews()
-      m.configureMainMenu()
+      m.configureNavMenu()
 
       if m.isInitialLaunch
         m.log.info("is first launch")
@@ -75,15 +75,6 @@ namespace mc.sample
       end if
 
       m.tabController = m.createSGNode("mv_TabController", m.top, "tabController")
-      m.navMenu = m.createSGNode("mv_ControlsGroup", m.top, "navMenu", {
-        translation: [200, 50]
-        layoutMode: "horiz"
-        keyDirection: "horiz"
-        itemSpacings: [40]
-        observe: {
-          "selectedIndex": m.onMenuItemChange
-        }
-      })
     end function
 
 
@@ -91,32 +82,32 @@ namespace mc.sample
     '++ Menu Management
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private function configureMainMenu()
-      menuJson = m.bundle.menuItems
-      m.menuItems = []
-      buttons = []
-      for each itemJson in menuJson
-        item = m.createSGNode("ContentNode", invalid, itemJson.id, {
-          title: itemJson.title
-        })
-        mc.setOrAddNodeField(item, "screenType", itemJson.screen)
-        if itemJson.isDefault = true
-          m.homeItem = item
-        end if
-        m.menuItems.push(item)
-        m.createSGNode("mv_Button", m.navMenu, item.title, {
-          text: item.title
-        })
-      end for
-      m.navMenu.appendChildren(buttons)
-      m.navMenu@.updateChildren()
-    end function
-
     private function onMenuItemChange(index as integer)
       m.log.info("selected tab item", index)
-      m.currentMenuItem = m.menuItems[index]
+      m.currentMenuItem = m.navMenu@.getItems()[index]
       m.tabController@.changeCurrentItem(m.currentMenuItem)
+
       m.setFocus(m.tabController)
+    end function
+
+    private function configureNavMenu()
+      if m.navMenu = invalid
+        m.navMenu = m.createSGNode("TopMenu", m.top, "topMenu", {
+          observe: {
+            selectedIndex: m.onMenuItemChange,
+          }
+        })
+      end if
+      bundle = m.styleManager@.loadBundle("pkg:/source/main/view/TopMenu.bundle")
+      m.navMenu@.setItems(bundle.menuItems)
+    end function
+
+    function setTopMenuVisible(visible as boolean)
+      m.log.info("setting side menu visible", visible)
+
+      if m.navMenu <> invalid
+        m.navMenu.visible = visible
+      end if
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -165,6 +156,28 @@ namespace mc.sample
       if isSelfFocused
         m.setFocusOnContent(m.isFocusedOnContent)
       end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Callbacks
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public override function onExecuteSelection(selection as mc.types.node) as boolean
+      super.onExecuteSelection(selection)
+      m.log.info("Executing selection", mc.dv(selection))
+      m.tabController.currentItem = selection.currentItem
+
+      if selection.action = "display"
+        screen = m.createSGNode("DetailsScreen", invalid, "detailsScreen", {
+          originSelection: selection
+        })
+        navController = selection.originScreen.navController
+
+        navController@.push(screen)
+        m.setFocus(navController)
+        return true
+      end if
+      return false
     end function
   end class
 end namespace
