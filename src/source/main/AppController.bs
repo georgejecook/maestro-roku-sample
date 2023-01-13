@@ -84,10 +84,14 @@ namespace mc.sample
 
     private function onMenuItemChange(index as integer)
       m.log.info("selected tab item", index)
-      m.currentMenuItem = m.navMenu@.getItems()[index]
-      m.tabController@.changeCurrentItem(m.currentMenuItem)
+      if index = 0
+        m.currentMenuItem = m.navMenu@.getItems()[index]
+        m.tabController@.changeCurrentItem(m.currentMenuItem)
 
-      m.setFocus(m.tabController)
+        m.setFocus(m.tabController)
+      else
+        m.log.error("screen for index", index, "not yet implemented")
+      end if
     end function
 
     private function configureNavMenu()

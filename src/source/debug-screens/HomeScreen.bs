@@ -20,7 +20,6 @@ class HomeScreen extends mv.BaseScreen
   private contentId = 0
   private rowSettings
   private focusSettings
-  private cellSettings
   private loadingIndicator
 
   @inject("appController")
@@ -46,7 +45,7 @@ class HomeScreen extends mv.BaseScreen
       width: size[0]
       height: size[1]
     })
-    mioc.setInstance("list", m.list)
+    m.setInstance("list", m.list)
     m.loadingIndicator = m.createSGNode("LoadingIndicator", m.top, "loadingIndicator", {
       isActive: true
       width: 1920
@@ -57,21 +56,12 @@ class HomeScreen extends mv.BaseScreen
   end function
 
   private function onResetChange()
-    m.list@.setListContent(invalid)
+    m.list@.setContent(invalid)
 
-    m.cellSettings = ml.listMixin.createCellSettings("CustomSimpleCell", [560, 250], 5)
-
-    m.focusSettings = ml.listMixin.createFocusSettings("fixed")
-    m.focusSettings.feedbackStyle = "none"
-
-    headerSettings = ml.listMixin.createHeaderSettings([10, 30], 80, "mediumBold,30", "#000000")
-    m.rowSettings = ml.listMixin.createRowSettings(m.cellSettings, m.focusSettings, 10, headerSettings, -1, "ml_HorizontalRow", 250)
-    m.rowSettings.numberItemsToRenderBefore = 10
-    m.rowSettings.numberItemsToRenderAfter = 10
-    m.rowSettings.screenPos = 300
-
+    m.rowSettings = m.createRowSettings()
     listSettings = m.createListSettings()
-    content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
+
+    content = m.createListContent(listSettings)
 
     timer = new mc.utils.DebugTimer("list")
     timer.log("makeRows")
@@ -90,8 +80,22 @@ class HomeScreen extends mv.BaseScreen
       m.onListRenderState("rendered")
       m.loadingIndicator.isActive = false
     else
-      m.observeNodeField(m.list, "state", m.onListRenderState, "value", true)
+      m.observe(m.list.state, m.onListRenderState, "value", true)
     end if
+  end function
+
+  private function createRowSettings()
+    cellSettings = ml.listMixin.createCellSettings("CustomSimpleCell", [560, 250], 5)
+
+    m.focusSettings = ml.listMixin.createFocusSettings("fixed")
+    m.focusSettings.feedbackStyle = "none"
+
+    headerSettings = ml.listMixin.createHeaderSettings([10, 30], 80, "mediumBold,30", "#000000")
+    rowSettings = ml.listMixin.createRowSettings(cellSettings, m.focusSettings, 10, headerSettings, -1, "ml_HorizontalRow", 250)
+    rowSettings.numberItemsToRenderBefore = 10
+    rowSettings.numberItemsToRenderAfter = 10
+    rowSettings.screenPos = 300
+    return rowSettings
   end function
 
   private function createListSettings()
@@ -103,6 +107,10 @@ class HomeScreen extends mv.BaseScreen
     listSettings.numberItemsToRenderBefore = 10
     listSettings.renderStrategy = "dynamic"
     return listSettings
+  end function
+
+  private function createListContent(listSettings as mc.types.node)
+    return ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
   end function
 
   private function onListRenderState(state as string)
@@ -117,12 +125,11 @@ class HomeScreen extends mv.BaseScreen
     content.push(m.makeHeroRow())
 
     for i = 0 to m.numberOfRows - 1
-      row = createObject("roSGNode", "ml_RowContent")
+      row = m.createSGNode("ml_RowContent")
       row.settings = m.rowSettings
-      row.id = rnd(2147483647).toStr()
       numItems = 20
 
-      row.title = "Row " + str(i)
+      row.title = "Row" + str(i)
       content.push(row)
       row@.appendChildren(m.makeItems(numItems))
     end for
@@ -214,12 +221,12 @@ class HomeScreen extends mv.BaseScreen
 
     row = m.list@.getRowRenderer(event.rowIndex)
     if row <> invalid
-      mioc.setInstance("focusedIndex", {
+      m.setInstance("focusedIndex", {
         row: event.rowIndex
         cell: row.focusedCellIndex
       })
     else
-      mioc.setInstance("focusedIndex", {
+      m.setInstance("focusedIndex", {
         row: -1
         cell: -1
       })

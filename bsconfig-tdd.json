@@ -8,6 +8,7 @@
     "!**/images/**/*.*",
     "**/BaseTest*.spec.bs",
     "**/START",
+"source/debug-screens/HomeScreen.spec.bs",
     "**/END"
   ],
 
