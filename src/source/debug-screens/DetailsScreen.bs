@@ -98,6 +98,8 @@ namespace spectrum.view
 
     private function onPlaySelected()
       m.log.info("Play button selected")
+      selection = m.createSelection(m.originSelection.currentItem, "play")
+      m.executeSelection(selection)
     end function
 
 
@@ -290,6 +292,7 @@ namespace spectrum.view
       super.onShow()
       m.appController@.setTopMenuVisible(false)
       m.log.info("showing details screen for item", mc.dv(asNode(m.originSelection.initialItem)))
+      m.setFocus(m.buttonsGroup)
     end function
 
     protected override function onFirstShow()

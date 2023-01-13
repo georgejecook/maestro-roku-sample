@@ -35,6 +35,7 @@ namespace mc.sample
 
     private registry = new mc.Registry()
     private bundle as mc.types.assocarray
+    private video as mc.types.node
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ Initialization
@@ -144,6 +145,13 @@ namespace mc.sample
     end function
 
     protected override function onKeyPressBack() as boolean
+      if m.video <> invalid
+        m.video.control = "stop"
+        m.video.visible = false
+        m.setFocusOnContent(true)
+        return true
+      end if
+
       if m.isFocusedOnContent
         m.setFocusOnContent(false)
         return true
@@ -180,8 +188,30 @@ namespace mc.sample
         navController@.push(screen)
         m.setFocus(navController)
         return true
+      else if selection.action = "play"
+        m.handlePlaySelection(selection)
       end if
       return false
     end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    private function handlePlaySelection(selection as mc.types.node) as boolean
+      m.log.info("Playing selection", mc.dv(selection))
+      if m.video = invalid
+        m.video = m.createSGNode("Video", m.top, "videoNode")
+      end if
+      content = m.createSGNode("ContentNode", invalid, "contentNode", {
+        streamFormat: "hls",
+        url: selection.currentItem.json.videoUrl
+      })
+      m.setFocus(m.video)
+      m.video.content = content
+      m.video.control = "play"
+      return true
+    end function
+
+
   end class
 end namespace

@@ -151,7 +151,7 @@ class HomeScreen extends mv.BaseScreen
         title: title
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam lorem id ante feugiat fermentum. Proin mi erat, pretium at ante at, condimentum porta lacus. Proin hendrerit tincidunt risus blandit gravida. Duis imperdiet, nulla ut maximus viverra, magna nulla tristique diam, eget rhoncus eros sem quis magna. Quisque viverra ultricies sem ac dictum. Cras sit amet lectus eros. Duis lobortis ligula ac sapien pharetra imperdiet. Vestibulum dictum urna quis orci fermentum ultricies ac in orci."
         posterUrl: "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + `/${size[0]}/${size[1]}`
-
+        videoUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8"
       }
     })
     child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + `/${size[0]}/${size[1]}`
