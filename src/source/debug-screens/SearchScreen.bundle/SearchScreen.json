@@ -1,0 +1,62 @@
+{
+  "views": [
+    {
+      "id": "bgRect",
+      "_type": "mv_Rectangle",
+      "size": [1920, 1080],
+      "color": "~styles.colors.general.grey"
+    },
+    {
+      "id": "emptyResultsLabel",
+      "_type": "mv_Label",
+      "translation": [1100, 450],
+      "size": [500, 200],
+      "fontKey": "~styles.fonts.title-05",
+      "color": "#323232",
+      "horizAlign": "left",
+      "vertlign": "top",
+      "wrap": true,
+      "maxLines": 2,
+      "text": "Could not find any results.",
+      "visible": false
+    },
+    {
+      "id": "keyboard",
+      "_type": "mv_MiniKeyboard",
+      "isSecure": false,
+      "text": "",
+      "translation": [100, 200]
+    },
+    {
+      "id": "list",
+      "_type": "ml_List",
+      "translation": [750, 0],
+      "width": 1200,
+      "height": 1080
+    },
+    {
+      "id": "loadingIndicator",
+      "_type": "LoadingIndicator",
+      "translation": [400, 100],
+      "width": 1920,
+      "height": 1080,
+      "backgroundVisible": false,
+      "text": ""
+    }
+  ],
+  "styles": {
+    "rsgPalette": {
+      "keyboardColor": "#6699CC ",
+      "primaryTextColor": "#010101",
+      "focusColor": "#0066cc",
+      "focusItemColor": "~styles.colors.general.white"
+    },
+
+    "textEditBox": {
+      "hintTextColor": "#010101",
+      "hintText": "Search",
+      "textColor": "#010101"
+    },
+    "backgroundUri": ""
+  }
+}

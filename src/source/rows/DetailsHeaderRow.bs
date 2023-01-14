@@ -1,0 +1,101 @@
+import "pkg:/source/roku_modules/maestro/ml/BaseRow.brs"
+
+@node("DetailsHeaderRow", "ml_BaseRow")
+class DetailsHeaderRow extends ml.BaseRow
+
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Private Fields
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private title as mc.types.node
+  private description as mc.types.node
+  private backgroundPoster as mc.types.node
+  private buttonsGroup as mc.types.node
+  private playButton as mc.types.node
+  private favoriteButton as mc.types.node
+
+  private viewsCreated = false
+
+  private isFavorite = false
+
+  private currentItem as mc.types.node
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Initialization
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  protected override function initialize()
+    if not m.viewsCreated
+      m.createViews()
+    end if
+  end function
+
+  protected override function createViews()
+    json = m.styleManager@.loadBundle("pkg:/source/rows/DetailsHeaderRow.bundle")
+    m.createViewsFromStyleJson(json.views)
+    m.viewsCreated = true
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Public Methods
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function setItem(item as mc.types.node)
+    m.currentItem = item
+    m.title.text = asString(item.json.title)
+    m.description.text = asString(item.json.description)
+    m.backgroundPoster.uri = asString(item.json.posterUrl)
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Callbacks
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function onSelectedIndex(index as integer)
+    m.log.info("selected button", index)
+    selectedButton = m.buttonsGroup@.getSelectedButton()
+    if m.playButton.isSameNode(selectedButton)
+      m.onPlaySelected()
+
+    else if m.favoriteButton.isSameNode(selectedButton)
+      if m.isFavorite
+        m.removeFromFavorites()
+      else
+        m.addToFavorites()
+      end if
+    end if
+
+    selectedButton.isSelected = false
+  end function
+
+  private function onPlaySelected()
+    m.log.info("Play button selected")
+    selection = m.createSelection(m.currentItem, "play")
+    m.executeSelection(selection)
+  end function
+
+
+  private function addToFavorites()
+    m.log.info("Adding item to favorites")
+    m.favoriteButton.text = "Remove from favorites"
+    m.isFavorite = true
+  end function
+
+  private function removeFromFavorites()
+    m.log.info("Removing item from favorites")
+
+    m.favoriteButton.text = "Add to favorites"
+    m.isFavorite = false
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Row Delegate Methods
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function onDidGainFocus(event as ml.ListEvent)
+    if m.owner.isFocused or m.owner.isChildFocused
+      m.setFocus(m.buttonsGroup)
+    end if
+  end function
+
+end class

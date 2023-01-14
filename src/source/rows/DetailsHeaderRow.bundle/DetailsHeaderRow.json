@@ -1,12 +1,6 @@
 {
   "views": [
     {
-      "id": "backgroundRectangle",
-      "_type": "mv_Rectangle",
-      "size": [1920, 1080],
-      "color": "~styles.colors.general.grey"
-    },
-    {
       "id": "mainGroup",
       "_type": "Group",
       "translation": [0, 0],
@@ -14,7 +8,7 @@
         {
           "id": "backgroundPoster",
           "_type": "mv_Poster",
-          "size": [1920, 800],
+          "size": [1920, 700],
           "translation": [0, 0],
           "loadSync": true,
           "loadDisplayMode": "limitSize",
@@ -23,7 +17,7 @@
         {
           "id": "overlay",
           "_type": "mv_Poster",
-          "size": [1200, 800],
+          "size": [1200, 700],
           "translation": [0, 0],
           "loadSync": true,
           "loadDisplayMode": "limitSize",
@@ -40,13 +34,13 @@
               "id": "",
               "_type": "mv_Label",
               "translation": [0, 0],
-              "size": [700, 200],
+              "size": [700, 100],
               "fontKey": "~fonts.body-04",
               "color": "#000000",
               "horizAlign": "center",
               "vertlign": "center",
               "wrap": true,
-              "text": "Showing details screen using animations for scrolling"
+              "text": "Showing details screen with row details header"
             }
           ]
         },
@@ -61,10 +55,11 @@
           "_children": [
             {
               "_type": "mv_Label",
-              "id": "titleLabel",
+              "id": "title",
               "translation": [0, 0],
               "text": "Issac Asimov",
               "color": "~colors.general.white",
+
               "fontKey": "~fonts.title-07",
               "lineSpacing": 1,
               "wrap": true,
@@ -73,12 +68,12 @@
             },
 
             {
-              "id": "descriptionLabel",
+              "id": "description",
               "_type": "mv_Label",
               "translation": [0, 180],
               "fontKey": "~fonts.body-06",
               "text": "Foundation and Empire",
-              "color": "~styles.colors.general.white",
+              "color": "~colors.general.white",
               "size": [1200, 0],
               "wrap": true,
               "maxLines": 8,
@@ -88,6 +83,9 @@
             {
               "id": "buttonsGroup",
               "_type": "mv_ControlsGroup",
+              "observe": {
+                "selectedIndex": "onSelectedIndex"
+              },
               "_initializeAfterCreatingChildren": true,
               "itemSpacings": [40],
               "layoutMode": "horiz",
@@ -97,6 +95,7 @@
                   "id": "playButton",
                   "_type": "mv_Button",
                   "iconStyle": "~icons.play",
+                  "styleKey": "buttons.general",
                   "text": "Play",
                   "autoSize": true,
                   "iconPosition": "centerLeft",
@@ -106,34 +105,16 @@
                 {
                   "id": "favoriteButton",
                   "_type": "mv_Button",
-                  "iconStyle": "~icons.favorite",
-                  "iconPosition": "centerLeft",
+                  "styleKey": "buttons.general",
                   "text": "Add to favorites",
-                  "autoSize": true
+                  "autoSize": true,
+                  "size": [350, 88]
                 }
               ]
             }
           ]
         }
       ]
-    },
-    {
-      "id": "list",
-      "_type": "ml_List",
-      "translation": [40, 500],
-      "width": 1920,
-      "height": 1080,
-      "visible": true
-    },
-    {
-      "id": "loadingIndicator",
-      "_type": "LoadingIndicator",
-      "width": 1920,
-      "height": 1080,
-      "backgroundVisible": false,
-      "translation": [0, 0],
-      "text": "",
-      "isActive": true
     }
   ]
 }

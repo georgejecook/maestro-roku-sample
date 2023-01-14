@@ -1,0 +1,258 @@
+import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
+import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
+
+@node("SearchScreen", "mv_BaseScreen")
+class SearchScreen extends mv.BaseScreen
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Private Fields
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private list as mc.types.node
+  private keyboard as mc.types.node
+  private emptyResultsLabel
+
+  private searchText as string
+
+  private timer as mc.types.node
+
+  private loadingIndicator as mc.types.node
+
+  private searchTask as mc.types.node
+
+  private cellSettings as mc.types.node
+  private focusSettings as mc.types.node
+
+
+  function new()
+    super("SearchScreen")
+  end function
+
+  protected override function initialize()
+    super.initialize()
+
+    m.createViews()
+    m.observe(m.keyboard.textEditBox.text, m.onKeyboardTextInputChange)
+    m.list.delegate = m.top
+  end function
+
+  private function createViews()
+    m.log.info("createViews")
+
+    json = m.styleManager@.loadBundle("pkg:/source/debug-screens/SearchScreen.bundle")
+    m.createViewsFromStyleJson(json.views)
+
+    m.setKeyboardStyle(json.styles)
+  end function
+
+  private function setKeyboardStyle(styles as mc.types.assocarray)
+    m.observe(m.keyboard.textEditBox.hintTextColor, m.setHintTextColor) 'prevent roku bug for setting hint text color
+
+    palette = asAA(styles.rsgPalette)
+    textEditBox = asAA(styles.textEditBox)
+
+    m.keyboard.textEditBox.hintText = asString(textEditBox.hintText, "Search")
+    m.keyboard.textEditBox.hintTextColor = (asString(textEditBox.hintTextColor))
+    m.keyboard.backgroundUri = asString(styles.backgroundUri)
+
+    if palette.count() > 0
+      rsgPalette = m.createSGNode("RSGPalette")
+      rsgPalette.colors = {
+        keyboardColor: asString(palette.keyboardColor, "#A5A5A5")
+        primaryTextColor: asString(palette.primaryTextColor, "#A5A5A5"),
+        focusColor: asString(palette.focusColor, "#A5A5A5"),
+        focusItemColor: asString(palette.focusItemColor, "#A5A5A5"),
+      }
+      m.keyboard.palette = rsgPalette
+    end if
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Callbacks
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function onKeyboardTextInputChange(text as string)
+    m.log.info("Entered keyboard text", text)
+    m.cancelTask(m.searchTask)
+
+    if len(text) > 1
+      m.searchText = text
+      m.waitToFinishTyping()
+    else if len(text) < 1
+      m.list.visible = false
+      m.emptyResultsLabel.visible = false
+    end if
+  end function
+
+  private function onFinishedTyping()
+    m.cancelTimeout(m.timer)
+    m.timer = invalid
+
+    m.log.info("Finished typing, search text is", m.searchText)
+    m.searchItems()
+  end function
+
+  private function onSearchTaskResponse(result as mc.Result)
+    m.log.info("got response", result)
+
+    isContentPresent = false
+    m.loadingIndicator.isActive = false
+
+    if result.isOk
+      m.log.info("Search response was ok")
+      content = m.makeListContent()
+      content@.setNotificationsEnabled(false)
+      row = m.makeItemsRow(result.data)
+      content@.appendChild(row)
+
+      m.list@.setContent(content)
+
+      isContentPresent = row.length > 0
+    else
+      m.log.error("search failed")
+    end if
+
+    m.emptyResultsLabel.visible = not isContentPresent
+    m.list.visible = isContentPresent
+    m.list.focusIndicatorManager.isHidden = not isContentPresent
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Private Methods
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function makeListContent()
+    m.cellSettings = ml.listMixin.createCellSettings("CustomSimpleCell", [560, 250], 5)
+
+    m.focusSettings = ml.listMixin.createFocusSettings("fixed")
+    m.focusSettings.feedbackStyle = "none"
+
+    listSettings = m.createListSettings()
+    content = ml.listMixin.createListContent(m.focusSettings, invalid, listSettings)
+
+    timer = new mc.utils.DebugTimer("list")
+    timer.log("setListContent")
+
+    return content
+  end function
+
+  private function createListSettings()
+    listSettings = ml.listMixin.createListSettings()
+    listSettings.rowCreationStrategy = "async"
+    listSettings.rowCreationBatchSize = 10
+    listSettings.rowCreationBatchDelay = 0.3
+    listSettings.numberItemsToRenderAfter = 10
+    listSettings.numberItemsToRenderBefore = 10
+    listSettings.renderStrategy = "dynamic"
+    return listSettings
+  end function
+
+  private function load()
+    m.log.info("loading")
+    m.list@.setContent(invalid)
+
+    m.cancelTask(m.searchTask)
+
+    m.log.info("setting list content")
+
+    m.loadingIndicator.isActive = true
+    m.list.focusIndicatorManager.isHidden = true
+    m.list.visible = false
+    m.setFocus(m.keyboard)
+    args = {
+      args: {
+        "searchText": m.searchText
+      }
+    }
+
+    m.searchTask = m.createTask("SearchTask", args, m.onSearchTaskResponse)
+  end function
+
+  private function waitToFinishTyping()
+    if m.timer <> invalid
+      m.cancelTimeout(m.timer)
+    end if
+
+    m.log.info("Waiting 2 seconds to finish typing")
+    m.timer = m.setTimeout(m.onFinishedTyping, 2)
+  end function
+
+  private function searchItems()
+    m.emptyResultsLabel.visible = false
+    m.load()
+  end function
+
+  'avoid roku bug for setting hint text color
+  private function setHintTextColor(color as string)
+    if color < 0
+      color = "#010101"
+    end if
+    m.keyboard.textEditBox.hintTextColor = color
+  end function
+
+  private function makeItemsRow(data as mc.types.array)
+    row = createObject("roSGNode", "ml_RowContent")
+    numColumns = 2
+    row.settings = ml.listMixin.createGridRowSettings(m.cellSettings, m.focusSettings, 30, invalid, 150, numColumns, 300, 5, 50)
+    items = []
+    for each json in data
+      id = rnd(2147483647).toStr()
+      item = m.createSGNode("Item", invalid, id, {
+        json: json
+      })
+      items.push(item)
+    end for
+    row@.appendChildren(items)
+    return row
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Lifecycle Methods
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  protected override function onGainedFocus(isSelfFocused as boolean)
+    m.log.info("Search screen gained focus - focusing keyboard ")
+    super.onGainedFocus(isSelfFocused)
+
+    if isSelfFocused
+      m.setFocus(m.keyboard)
+    end if
+  end function
+
+  protected override function cleanup()
+    m.log.info("screen", m.__classname, "does not ever get cleaned up")
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Key Presses
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function onKeyPressRight() as boolean
+    if not m.loadingIndicator.isActive and not m.isControlFocused(m.list) and asInteger(m.list.content.length) > 0
+      m.setFocus(m.list)
+    end if
+    return true
+  end function
+
+  private function onKeyPressLeft() as boolean
+    if m.list.isChildFocused
+      m.setFocus(m.keyboard)
+      return true
+    end if
+    return false
+  end function
+
+  private function onKeyPressUp() as boolean
+    return false
+  end function
+
+  private function onKeyPressDown() as boolean
+    return false
+  end function
+
+  protected override function onKeyPressBack() as boolean
+    return false
+  end function
+
+end class

@@ -41,29 +41,119 @@
   "icons": {
     "default": {
       "normal": {
-        "blendColor": "~styles.colors.general.white",
+        "blendColor": "~colors.general.white",
         "size": [32, 32],
         "translation": [0, 0],
         "uri": ""
       },
       "focused": {
-        "blendColor": "~styles.colors.general.white",
+        "blendColor": "~colors.general.white",
         "size": [42, 42]
       },
       "selected": {
-        "blendColor": "~styles.colors.general.white",
+        "blendColor": "~colors.general.white",
         "size": [42, 42]
       }
     },
     "play": {
       "$extends": "~styles.icons.default",
       "uri": "pkg:/images/play-icon-$$RES$$.png",
-      "size": [40, 40]
+      "size": [50, 50]
     },
     "favorite": {
       "$extends": "~styles.icons.default",
-      "uri": "pkg:/images/fav-icon.png",
-      "size": [40, 40]
+      "uri": "pkg:/images/fav-icon.jpg",
+      "size": [50, 50]
+    }
+  },
+  "buttons": {
+    "general": {
+      "size": [0, 0],
+      "textOffset": [0, -1],
+      "iconOffset": [-1, -1],
+      "normal": {
+        "label": {
+          "fontKey": "~fonts.body-04",
+          "color": "~colors.general.black",
+          "translation": [30, 10],
+          "size": [300, 60],
+          "horizAlign": "left",
+          "vertAlign": "center"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.body-04",
+          "color": "~colors.general.black",
+          "translation": [30, 40],
+          "size": [0, 20],
+          "vertAlign": "top",
+          "horizAlign": "left"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#ffffff"
+        },
+        "iconPoster": {
+          "blendColor": "#ffffff",
+          "size": [0, 0],
+          "translation": [0, 0]
+        }
+      },
+      "focused": {
+        "label": {
+          "size": [300, 60],
+          "fontKey": "~fonts.title-04",
+          "color": "#ffffff"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#6699CC"
+        }
+      },
+      "disabled": {
+        "label": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.grey",
+          "translation": [0, 0],
+          "size": [0, 60],
+          "horizAlign": "left",
+          "vertAlign": "center"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.grey",
+          "translation": [0, 40],
+          "size": [0, 20],
+          "vertAlign": "top",
+          "horizAlign": "left"
+        },
+        "backgroundPoster": {
+          "uri": ""
+        },
+        "iconPoster": {
+          "blendColor": "#aaaaaa"
+        }
+      },
+      "selected": {
+        "label": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#6699CC"
+        },
+        "iconPoster": {
+          "blendColor": "#6699CC"
+        }
+      }
     }
   }
 }

@@ -203,6 +203,11 @@ class HomeScreen extends mv.BaseScreen
     end if
   end function
 
+
+  protected override function cleanup()
+    m.log.info("screen", m.__classname, "does not ever get cleaned up")
+  end function
+
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ list delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -255,7 +260,12 @@ class HomeScreen extends mv.BaseScreen
     item = m.list@.getItem(event.rowIndex, event.cellIndex)
 
     m.log.info("Selected Item", mc.dv(item))
-    selection = m.createSelection(item, "display", "detailsScreen")
+    if event.rowIndex = 1
+      screen = "RowHeaderDetailsScreen"
+    else
+      screen = "DetailsScreen"
+    end if
+    selection = m.createSelection(item, "display", {}, screen)
 
     m.executeSelection(selection)
   end function
@@ -267,4 +277,9 @@ class HomeScreen extends mv.BaseScreen
   private function isCapturingAnyKeyPress(key as string, press as boolean) as boolean
     return key <> "back" and key <> "up"
   end function
+
+  protected override function onKeyPressBack() as boolean
+    return false
+  end function
+
 end class

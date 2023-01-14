@@ -85,10 +85,9 @@ namespace mc.sample
 
     private function onMenuItemChange(index as integer)
       m.log.info("selected tab item", index)
-      if index = 0
+      if index < 2
         m.currentMenuItem = m.navMenu@.getItems()[index]
         m.tabController@.changeCurrentItem(m.currentMenuItem)
-
         m.setFocus(m.tabController)
       else
         m.log.error("screen for index", index, "not yet implemented")
@@ -180,7 +179,7 @@ namespace mc.sample
       m.tabController.currentItem = selection.currentItem
 
       if selection.action = "display"
-        screen = m.createSGNode("DetailsScreen", invalid, "detailsScreen", {
+        screen = m.createSGNode(selection.targetScreen, invalid, "detailsScreen", {
           originSelection: selection
         })
         navController = selection.originScreen.navController
@@ -194,13 +193,25 @@ namespace mc.sample
       return false
     end function
 
+    private function onVideoStateChange(state as string)
+      m.log.info("video state changed", state)
+      if state = "stopped"
+        m.video.visible = false
+        m.setFocusOnContent(true)
+      end if
+    end function
+
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ Private methods
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private function handlePlaySelection(selection as mc.types.node) as boolean
       m.log.info("Playing selection", mc.dv(selection))
+
       if m.video = invalid
         m.video = m.createSGNode("Video", m.top, "videoNode")
+        m.observe(m.video.state, m.onVideoStateChange)
+      else
+        m.video.visible = true
       end if
       content = m.createSGNode("ContentNode", invalid, "contentNode", {
         streamFormat: "hls",
