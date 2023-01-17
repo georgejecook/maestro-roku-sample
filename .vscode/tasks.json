@@ -19,7 +19,7 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      },
+      }
     },
     {
       "label": "build-test",
@@ -37,12 +37,12 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      },
+      }
     },
     {
-      "label": "build-prod",
+      "label": "build-tdd",
       "type": "shell",
-      "command": "npm run build-prod",
+      "command": "npm run build-tdd",
       "problemMatcher": [],
       "presentation": {
         "echo": true,
@@ -55,7 +55,25 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      },
+      }
     },
+    {
+      "label": "build-prod",
+      "type": "shell",
+      "command": "npm run build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
   ]
 }

@@ -7,48 +7,50 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "Run",
+      "name": "DEV",
       "stopOnEntry": false,
       "preLaunchTask": "build-dev",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
       "rootDir": "${workspaceFolder}/build",
-      "sourceDirs": [
-        "${workspaceFolder}/src"
-      ],
-      "files": [
-        "manifest",
-        "source/**/*.*",
-        "components/**/*.*",
-        "images/**/*.*",
-        "font/**/*.*",
-        "!*.zip",
-        "!**/*.zip"
-      ],
+      "files": ["*", "*.*", "**/*.*"]
     },
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "Tests",
+      "name": "PROD",
+      "stopOnEntry": false,
+      "preLaunchTask": "build-prod",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "rootDir": "${workspaceFolder}/build",
+      "files": ["*", "*.*", "**/*.*"]
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "TEST",
       "stopOnEntry": false,
       "preLaunchTask": "build-test",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
       "rootDir": "${workspaceFolder}/build",
-      "sourceDirs": [
-        "${workspaceFolder}/src"
-      ],
-      "files": [
-        "manifest",
-        "source/**/*.*",
-        "components/**/*.*",
-        "images/**/*.*",
-        "font/**/*.*",
-        "!*.zip",
-        "!**/*.zip"
-      ],
+      "files": ["*", "*.*", "**/*.*"]
+    },
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "OPEN TEST FILES",
+      "stopOnEntry": false,
+      "preLaunchTask": "build-tdd",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:ROKU_DEVPASSWORD}",
+      "rootDir": "${workspaceFolder}/build",
+      "files": ["*", "*.*", "**/*.*"]
     }
   ]
 }

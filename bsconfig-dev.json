@@ -1,38 +1,62 @@
 {
-  "rootDir": "src",
+  "extends": "bsconfig.json",
   "files": [
+    "!**/*.i8n.json",
     "manifest",
     "source/**/*.*",
+    "images/**/*.*",
+    "sounds/**/*.*",
+    "fonts/**/*.*",
     "components/**/*.*",
+    "meta/**/*.*",
     "!**/*.spec.bs"
   ],
-  "autoImportComponentScript": true,
-  "createPackage": false,
-  "stagingFolderPath": "build",
+  "plugins": ["maestro-roku-bsc-plugin", "roku-log-bsc-plugin"],
   "diagnosticFilters": [
     {
       "src": "**/roku_modules/**/*.*"
+    },
+    {
+      "src": "node_modules/**/*.*"
+    },
+    {
+      "src": "**/maestro/**/*.*"
+    },
+    {
+      "src": "**/RALETrackerTask.*"
+    },
+    {
+      "src": "**/*spec.bs",
+      "codes": ["LINT3011"]
+    },
+    1128
+  ],
+  "maestro": {
+    "excludeFilters": [
+      "**/RALETrackerTask.*",
+      "**/node_modules/**/*",
+      "**/roku_modules/**/*",
+      "**/rooibos/**/*"
+    ],
+    "buildForIDE": false,
+    "extraValidation": {
+      "doExtraValidation": true,
+      "doExtraImportValidation": true,
+      "excludeFilters": []
     }
-  ],
-  "plugins": [
-    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
-  ],
+  },
   "rooibos": {
     "isRecordingCodeCoverage": false,
     "testsFilePattern": null
   },
-  "maestro": {
-    "buildTimeImports": {
-      "IAuthProvider": [],
-      "IEntitlementsProvider": [],
-      "IBookmarksProvider": [],
-      "IPlayerAnalytics": [],
-      "IAnalytics": []
-    }
-  },
   "rokuLog": {
     "strip": false,
-    "insertPkgPath": true
+    "insertPkgPath": true,
+    "removeComments": true
+  },
+  "logLevel": "error",
+  "retainStagingFolder": true,
+  "transpileOptions": {
+    "removeParameterTypes": true
   }
 }

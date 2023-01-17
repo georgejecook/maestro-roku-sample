@@ -1,0 +1,37 @@
+{
+  "menuItems": [
+    {
+      "id": "home",
+      "title": "HomeScreen",
+      "screen": "HomeScreen",
+      "isDefault": true
+    },
+    {
+      "id": "buttons",
+      "title": "Buttons",
+      "screen": "ButtonScreen",
+      "isDefault": true
+    },
+    {
+      "id": "animations",
+      "title": "Animations",
+      "screen": "AnimationScreen",
+      "isDefault": true
+    },
+    {
+      "id": "listScreen",
+      "title": "List Screen",
+      "screen": "ListScreen"
+    },
+    {
+      "id": "team screen",
+      "title": "team Screen",
+      "screen": "TeamScreen"
+    },
+    {
+      "id": "module screen",
+      "title": "module Screen",
+      "screen": "ModuleScreen"
+    }
+  ]
+}

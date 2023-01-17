@@ -1,0 +1,217 @@
+import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
+import "pkg:/source/roku_modules/maestro/core/Registry.brs"
+import "pkg:/source/roku_modules/maestro/view/BaseAppController.brs"
+
+namespace mc.sample
+  @node("AppController", "mv_BaseView")
+  class AppController extends mv.BaseAppController
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Public fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public isFirstLoadComplete = false
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Views
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private navMenu as mc.types.node
+    private tabController as mc.types.node
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ State
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private menuItems = []
+    private isFocusedOnContent = true
+    private isInitialLaunch = true
+    private homeItem as mc.types.node
+    private currentMenuItem as mc.types.node
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private registry = new mc.Registry()
+    private bundle as mc.types.assocarray
+    private video as mc.types.node
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public function new()
+      super("AppController")
+    end function
+
+
+    protected override function initialize()
+      super.initialize()
+      'for mucking around with @sync injection
+      settings = m.createSGNode("ContentNode")
+      mc.setOrAddNodeField(settings, "spoilersActive", false)
+      m.setInstance("user", { settings: settings })
+
+      m.bundle = m.styleManager@.loadBundle("pkg:/source/main/AppController.bundle")
+
+      m.createViews()
+      m.configureNavMenu()
+
+      if m.isInitialLaunch
+        m.log.info("is first launch")
+
+        m.onMenuItemChange(0)
+        m.isInitialLaunch = false
+      else
+        m.onMenuItemChange(m.navMenu.selectedIndex)
+      end if
+      m.isFirstLoadComplete = true
+    end function
+
+    private function createViews() as void
+      if m.tabController <> invalid
+        m.log.warn("not creating AppController views, as they were previously instantiated")
+        return
+      end if
+
+      m.tabController = m.createSGNode("mv_TabController", m.top, "tabController")
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Menu Management
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onMenuItemChange(index as integer)
+      m.log.info("selected tab item", index)
+      if index = 0
+        m.currentMenuItem = m.navMenu@.getItems()[index]
+        m.tabController@.changeCurrentItem(m.currentMenuItem)
+
+        m.setFocus(m.tabController)
+      else
+        m.log.error("screen for index", index, "not yet implemented")
+      end if
+    end function
+
+    private function configureNavMenu()
+      if m.navMenu = invalid
+        m.navMenu = m.createSGNode("TopMenu", m.top, "topMenu", {
+          observe: {
+            selectedIndex: m.onMenuItemChange,
+          }
+        })
+      end if
+      bundle = m.styleManager@.loadBundle("pkg:/source/main/view/TopMenu.bundle")
+      m.navMenu@.setItems(bundle.menuItems)
+    end function
+
+    function setTopMenuVisible(visible as boolean)
+      m.log.info("setting side menu visible", visible)
+
+      if m.navMenu <> invalid
+        m.navMenu.visible = visible
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Public Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public function setFocusOnContent(focusOnContent as boolean, animated = true as boolean)
+      m.isFocusedOnContent = focusOnContent
+      m.setFocus(focusOnContent ? m.tabController : m.navMenu)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Key Presses
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function isCapturingAnyKeyPress(key as string, press as boolean) as boolean
+      return true
+    end function
+
+    private function onKeyPressUp() as boolean
+      m.setFocusOnContent(false)
+      return true
+    end function
+
+    private function onKeyPressDown() as boolean
+      if not m.isFocusedOnContent
+        m.setFocusOnContent(true)
+      end if
+      return true
+    end function
+
+    protected override function onKeyPressBack() as boolean
+      if m.video <> invalid
+        m.video.control = "stop"
+        m.video.visible = false
+        m.setFocusOnContent(true)
+        return true
+      end if
+
+      if m.isFocusedOnContent
+        m.setFocusOnContent(false)
+        return true
+      end if
+      return false
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ LifeCycle Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+    protected override function onGainedFocus(isSelfFocused as boolean)
+      if isSelfFocused
+        m.setFocusOnContent(m.isFocusedOnContent)
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Callbacks
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public override function onExecuteSelection(selection as mc.types.node) as boolean
+      super.onExecuteSelection(selection)
+      m.log.info("Executing selection", mc.dv(selection))
+      m.tabController.currentItem = selection.currentItem
+
+      if selection.action = "display"
+        screen = m.createSGNode("DetailsScreen", invalid, "detailsScreen", {
+          originSelection: selection
+        })
+        navController = selection.originScreen.navController
+
+        navController@.push(screen)
+        m.setFocus(navController)
+        return true
+      else if selection.action = "play"
+        m.handlePlaySelection(selection)
+      end if
+      return false
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    private function handlePlaySelection(selection as mc.types.node) as boolean
+      m.log.info("Playing selection", mc.dv(selection))
+      if m.video = invalid
+        m.video = m.createSGNode("Video", m.top, "videoNode")
+      end if
+      content = m.createSGNode("ContentNode", invalid, "contentNode", {
+        streamFormat: "hls",
+        url: selection.currentItem.json.videoUrl
+      })
+      m.setFocus(m.video)
+      m.video.content = content
+      m.video.control = "play"
+      return true
+    end function
+
+
+  end class
+end namespace

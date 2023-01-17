@@ -1,0 +1,321 @@
+import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/roku_modules/maestro/view/Animation.brs"
+import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
+import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
+
+
+namespace spectrum.view
+  @node("DetailsScreen", "mv_BaseScreen")
+  class DetailsScreen extends mv.BaseScreen
+
+    private bgRect as mc.types.node
+
+    private titleLabel as mc.types.node
+    private descriptionLabel as mc.types.node
+    private backgroundPoster as mc.types.node
+    private loadingIndicator as mc.types.node
+    private list as mc.types.node
+
+    private buttonsGroup as mc.types.node
+    private playButton as mc.types.node
+    private favoriteButton as mc.types.node
+    private infoContainer as mc.types.node
+    private mainGroup as mc.types.node
+
+    private isFavorite = false
+
+    private rowSettings as mc.types.node
+
+
+    @inject("appController")
+    private appController
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private Fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private mainGroupAnimation as mc.types.node
+    private listAnimation as mc.types.node
+
+    private infoContainerTranslation = [0, 0]
+    private listTranslation = [0, 0]
+    private rowVisibleOnScreen = false
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function new()
+      super("DetailsScreen")
+    end function
+
+    protected override function initialize()
+      m.log.info("Initialized DetailsScreen")
+      super.initialize()
+
+      m.createViews()
+
+      m.mainGroupAnimation = new mv.animations.Move(m.mainGroup, 0.3, m.mainGroup.translation, m.mainGroup.translation)
+      m.mainGroupAnimation.start()
+
+      m.listAnimation = new mv.animations.Move(m.list, 0.3, m.list.translation, m.list.translation)
+      m.listAnimation.start()
+
+      if asNode(m.originSelection.initialItem) <> invalid
+        m.setListContent()
+      end if
+
+      m.observe(m.buttonsGroup.selectedIndex, m.onButtonsGroupSelectedIndex)
+    end function
+
+    private function createViews()
+      json = m.styleManager@.loadBundle("pkg:/source/debug-screens/DetailsScreen.bundle")
+      m.createViewsFromStyleJson(json.views)
+
+      m.listTranslation = m.list.translation
+      m.infoContainerTranslation = m.infoContainer.translation
+      if m.originSelection <> invalid
+        m.updateDetails()
+      end if
+    end function
+
+    private function updateDetails()
+      json = m.originSelection.currentItem.json
+      m.titleLabel.text = asString(json.title)
+      m.backgroundPoster.uri = asString(json.posterUrl)
+      m.descriptionLabel.text = asString(json.description, "")
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function resetButtonSelectedState(index as integer)
+      m.buttonsGroup.getChild(index).isSelected = false
+    end function
+
+    private function onPlaySelected()
+      m.log.info("Play button selected")
+      selection = m.createSelection(m.originSelection.currentItem, "play")
+      m.executeSelection(selection)
+    end function
+
+
+    private function addToFavorites()
+      m.log.info("Adding item to favorites")
+      m.favoriteButton.text = "Remove from favorites"
+      m.isFavorite = true
+    end function
+
+    private function removeFromFavorites()
+      m.log.info("Removing item from favorites")
+
+      m.favoriteButton.text = "Add to favorites"
+      m.isFavorite = false
+    end function
+
+    private function setListContent()
+      m.log.info("setting list content")
+
+      m.list@.setContent(invalid)
+
+      cellSettings = ml.listMixin.createCellSettings("CustomSimpleCell", [560, 250], 5)
+
+      focusSettings = ml.listMixin.createFocusSettings("fixed")
+      focusSettings.feedbackStyle = "none"
+
+      headerSettings = ml.listMixin.createHeaderSettings([10, 30], 80, "mediumBold,30", "#000000")
+      m.rowSettings = ml.listMixin.createRowSettings(cellSettings, focusSettings, 10, headerSettings, -1, "ml_HorizontalRow", 250)
+      m.rowSettings.numberItemsToRenderBefore = 10
+      m.rowSettings.numberItemsToRenderAfter = 10
+      m.rowSettings.screenPos = 300
+
+      listSettings = m.createListSettings()
+      content = ml.listMixin.createListContent(focusSettings, m.rowSettings, listSettings)
+
+      timer = new mc.utils.DebugTimer("list")
+      timer.log("makeRows")
+
+      m.setFocus(m.loadingIndicator)
+
+      content@.setNotificationsEnabled(false)
+      content@.appendChild(m.makeRelatedRow())
+
+      m.list@.setContent(content)
+      m.list.delegate = m.top
+
+      if m.list.state = "rendered"
+        m.onListRenderState("rendered")
+        m.loadingIndicator.isActive = false
+      else
+        m.observeNodeField(m.list, "state", m.onListRenderState, "value", true)
+      end if
+    end function
+
+    private function makeRelatedRow()
+      row = createObject("roSGNode", "ml_RowContent")
+      row.settings = m.rowSettings
+      row.id = rnd(2147483647).toStr()
+      numItems = 20
+      row.title = "Related"
+      row@.appendChildren(m.makeItems(numItems))
+      return row
+    end function
+
+    private function createListSettings()
+      listSettings = ml.listMixin.createListSettings()
+      listSettings.rowCreationStrategy = "async"
+      listSettings.rowCreationBatchSize = 10
+      listSettings.rowCreationBatchDelay = 0.3
+      listSettings.numberItemsToRenderAfter = 10
+      listSettings.numberItemsToRenderBefore = 10
+      listSettings.renderStrategy = "dynamic"
+      return listSettings
+    end function
+
+    private function makeItems(number as integer, size = [560, 250] as mc.types.array)
+      items = []
+      for i = 0 to number - 1
+        items.push(m.makeItem(`Item ${i}`, size))
+      end for
+      return items
+    end function
+
+    private function makeItem(title as string, size = [560, 250] as mc.types.array) as mc.types.node
+      id = rnd(2147483647).toStr()
+      child = m.createSGNode("Item", invalid, id, {
+        json: {
+          title: title
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam lorem id ante feugiat fermentum. Proin mi erat, pretium at ante at, condimentum porta lacus. Proin hendrerit tincidunt risus blandit gravida. Duis imperdiet, nulla ut maximus viverra, magna nulla tristique diam, eget rhoncus eros sem quis magna. Quisque viverra ultricies sem ac dictum. Cras sit amet lectus eros. Duis lobortis ligula ac sapien pharetra imperdiet. Vestibulum dictum urna quis orci fermentum ultricies ac in orci."
+          posterUrl: "https://picsum.photos" + `/${size[0]}/${size[1]}`
+
+        }
+      })
+      child.HDGRIDPOSTERURL = "https://picsum.photos" + `/${size[0]}/${size[1]}`
+      return child
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Callbacks
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onButtonsGroupSelectedIndex(index as integer)
+      m.log.info("selected button", index)
+      button = m.buttonsGroup@.getSelectedButton()
+
+      if m.playButton.isSameNode(button)
+        m.onPlaySelected()
+
+      else if m.favoriteButton.isSameNode(button)
+        if m.isFavorite
+          m.removeFromFavorites()
+        else
+          m.addToFavorites()
+        end if
+      end if
+
+      m.resetButtonSelectedState(index)
+    end function
+
+    private function onListRenderState(state as string)
+      m.log.info("onListRenderState", state)
+      if state = "rendered"
+        m.loadingIndicator.isActive = false
+      end if
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ List Delegate
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onItemSelected(event as ml.ListEvent)
+      m.log.info("onItemSelected", event.rowIndex, event.cellIndex)
+
+      item = m.list@.getItem(event.rowIndex, event.cellIndex)
+
+      m.log.info("Selected Item", mc.dv(item))
+      selection = m.createSelection(item, "display", "detailsScreen")
+
+      m.executeSelection(selection)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Key Presses
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onKeyPressDown() as boolean
+      m.log.info("On key press down")
+
+      if not m.rowVisibleOnScreen
+        m.showRow(true)
+        m.setFocus(m.list)
+        m.list@.moveToRowItemIndex(0, m.list.focusedCellIndex)
+        return true
+      end if
+
+      return false
+    end function
+
+    private function onKeyPressUp() as boolean
+      m.log.info("On key press up")
+      if m.isControlFocused(m.list)
+        m.showRow(false)
+        m.setFocus(m.buttonsGroup)
+        return true
+      end if
+      return false
+    end function
+
+    private function showRow(show as boolean)
+      if show
+        m.log.info("Moving info container, showing list")
+        m.rowVisibleOnScreen = true
+        m.mainGroupAnimation.animateTo([m.mainGroup.translation[0], m.mainGroup.translation[1] - 800], 0.2)
+        m.listAnimation.animateTo([m.list.translation[0], m.list.translation[1] - 700], 0.2)
+      else
+        m.log.info("Moving list, showing info container")
+        m.rowVisibleOnScreen = false
+        m.mainGroupAnimation.animateTo([0, 0], 0.1)
+        m.listAnimation.animateTo(m.listTranslation, 0.1)
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Lifecycle Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function onShow()
+      super.onShow()
+      m.appController@.setTopMenuVisible(false)
+      m.log.info("showing details screen for item", mc.dv(asNode(m.originSelection.initialItem)))
+      m.setFocus(m.buttonsGroup)
+    end function
+
+    protected override function onFirstShow()
+      super.onFirstShow()
+      m.log.info("first show of details screen for item", mc.dv(asNode(m.originSelection.initialItem)))
+    end function
+
+
+    protected override function onHide()
+      m.log.info("On hide")
+      super.onHide()
+    end function
+
+    protected override function onGainedFocus(isSelfFocused as boolean)
+      super.onGainedFocus(isSelfFocused)
+      m.log.info("gaining focus")
+      if m.rowVisibleOnScreen
+        m.setFocus(m.list)
+      else
+        m.setFocus(m.buttonsGroup)
+      end if
+    end function
+
+
+  end class
+end namespace

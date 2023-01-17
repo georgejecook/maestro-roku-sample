@@ -1,38 +1,36 @@
 {
-  "rootDir": "src",
-  "files": [
-    "manifest",
-    "source/**/*.*",
-    "components/**/*.*"
-  ],
-  "autoImportComponentScript": true,
-  "createPackage": false,
-  "stagingFolderPath": "build",
-  "diagnosticFilters": [
-    {
-      "src": "**/roku_modules/**/*.*"
-    }
-  ],
-  "plugins": [
-    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
-  ],
+  "extends": "bsconfig.json",
+  "files": ["manifest", "source/**/*.*", "meta/**/*.*", "components/**/*.*"],
+  "plugins": ["roku-log-bsc-plugin", "maestro-roku-bsc-plugin", "rooibos-roku"],
   "rooibos": {
     "isRecordingCodeCoverage": false,
-    "testsFilePattern": null
+    "testsFilePattern": null,
+    "tags": ["!integration", "!deprecated", "!fixme", "!tbd"],
+    "showOnlyFailures": true,
+    "catchCrashes": true,
+    "lineWidth": 70,
+    "sendHomeOnFinish": false,
+    "failFast": false
   },
   "maestro": {
-    "buildTimeImports": {
-      "IAuthProvider": [],
-      "IEntitlementsProvider": [],
-      "IBookmarksProvider": [],
-      "IPlayerAnalytics": [],
-      "IAnalytics": []
+    "excludeFilters": [
+      "**/RALETrackerTask.*",
+      "**/roku_modules/**/*",
+      "**/node_modules/**/*"
+    ],
+    "nodeClasses": {
+      "buildForIDE": false,
+      "generateTestUtils": true
+    },
+    "extraValidation": {
+      "doExtraValidation": false,
+      "excludeFilters": [],
+      "doExtraImportValidation": false
     }
   },
   "rokuLog": {
     "strip": false,
     "insertPkgPath": true
-  }
+  },
+  "sourceMap": true
 }

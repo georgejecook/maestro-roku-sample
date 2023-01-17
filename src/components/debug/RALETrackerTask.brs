@@ -729,7 +729,7 @@ Sub UIThread_selectNode(args) as Object
 
     setSelectorView(node, nodeType, path)
 
-    m.logger.debug("Node selected: " + FW_AsString(m.currentNode))
+    ' m.logger.debug("Node selected: " + FW_AsString(m.currentNode))
     return {
         path: m.currentPath,
         node: getNodeData(m.currentNode, m.currentPath, root)
@@ -932,7 +932,7 @@ Sub UIThread_setField(args) as Object
         m.currentNode = setObjField(path, field, fieldValue, fieldType)
     end if
 
-    m.logger.debug("Field '" + field + "' of selected node was set to " + FW_AsString(fieldValue))
+    ' m.logger.debug("Field '" + field + "' of selected node was set to " + FW_AsString(fieldValue))
     return getFieldList(m.currentNode)
 End Sub
 
@@ -973,7 +973,7 @@ Sub UIThread_setFocus(args) as Object
     node = RALE_getNodeByPath(node, path)
     if node = Invalid then return getError("Invalid Path")
 
-    m.logger.debug(FW_AsString(node) + " was focused")
+    ' m.logger.debug(FW_AsString(node) + " was focused")
     node.setFocus(true)
     return { success: true }
 End Sub
@@ -994,7 +994,7 @@ Sub UIThread_selectFocusedNode(args) as Object
         m.currentNode = node
         m.currentPath = path
         setSelectorView(node, type(node), path)
-        m.logger.debug("Node selected: " + FW_AsString(node))
+        ' m.logger.debug("Node selected: " + FW_AsString(node))
         return {
             path: path,
             node: getNodeData(node, path, root)
@@ -1037,7 +1037,7 @@ Sub UIThread_setBoundingRect(args) as Object
 
         if node.hasField("translation") AND (deltaY <> 0 or deltaX <> 0) then
             fields.translation = [node.translation[0] - deltaX, node.translation[1] - deltaY]
-            m.logger.debug("Selected node translation was set to " + FW_AsString(fields.translation))
+            ' m.logger.debug("Selected node translation was set to " + FW_AsString(fields.translation))
         end if
 
         if node.hasField("width") AND deltaWidth <> 0 then
@@ -1046,7 +1046,7 @@ Sub UIThread_setBoundingRect(args) as Object
             else
                 fields.width = node.width - deltaWidth
             end if
-            m.logger.debug("Selected node width was set to " + FW_AsString(fields.width))
+            ' m.logger.debug("Selected node width was set to " + FW_AsString(fields.width))
         end if
 
         if node.hasField("height") AND deltaHeight <> 0 then
@@ -1055,7 +1055,7 @@ Sub UIThread_setBoundingRect(args) as Object
             else
                 fields.height = node.height - deltaHeight
             end if
-            m.logger.debug("Selected node height was set to " + FW_AsString(fields.height))
+            ' m.logger.debug("Selected node height was set to " + FW_AsString(fields.height))
         end if
 
         node.setFields(fields)
@@ -1474,7 +1474,7 @@ Sub addChild(node, childType, index) as Object
 
     addedChild = node.getChild(index)
     if type(addedChild) = "roSGNode" and addedChild.isSameNode(child) then
-        m.logger.debug("Child " + childType + " was added to " + FW_AsString(node) + " by index " + FW_AsString(index))
+        ' m.logger.debug("Child " + childType + " was added to " + FW_AsString(node) + " by index " + FW_AsString(index))
         return { success: true, child: addedChild, index: index }
     else
         return getError("Cannot Add Child")
@@ -1491,7 +1491,7 @@ Sub removeChild(node, index as Integer) as Object
     if FW_IsSGNode(node.getChild(index)) then
         node.removeChildIndex(index)
         if node.getChildCount() < count then
-            m.logger.debug("Child with index " + FW_AsString(index) + " was removed from " + FW_AsString(node))
+            ' m.logger.debug("Child with index " + FW_AsString(index) + " was removed from " + FW_AsString(node))
             return { success: true }
         end if
         return getError("Node cannot be removed")
@@ -1515,7 +1515,7 @@ Sub moveChild(node, fromIndex, toIndex) as Object
             if toIndex > fromIndex then toIndex--
             node.insertChild(child, toIndex)
 
-            m.logger.debug("Child of " + FW_AsString(node) + " was moved from index " + FW_AsString(fromIndex) + " to index " + FW_AsString(toIndex))
+            ' m.logger.debug("Child of " + FW_AsString(node) + " was moved from index " + FW_AsString(fromIndex) + " to index " + FW_AsString(toIndex))
             return { success: true }
         else
             return getError("No child with this index")

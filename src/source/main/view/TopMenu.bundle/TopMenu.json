@@ -1,0 +1,56 @@
+{
+  "menuItems": [
+    {
+      "id": "home",
+      "title": "",
+      "screen": "HomeScreen",
+      "isDefault": true
+    },
+    {
+      "id": "search",
+      "title": "Search",
+      "screen": "SearchScreen",
+      "isDefault": false
+    },
+    {
+      "id": "categories",
+      "title": "Categories",
+      "screen": "CategoriesScreen",
+      "isDefault": false
+    }
+  ],
+  "views": [
+    {
+      "id": "bgRect",
+      "_type": "mv_Rectangle",
+      "size": [1920, 144],
+      "translation": [0, 0],
+      "color": "#6699CC",
+      "visible": true,
+      "opacity": 0.6
+    },
+    {
+      "id": "logo",
+      "_type": "mv_Poster",
+      "translation": [84, 47],
+      "loadSync": true,
+      "uri": "pkg:/images/menu/generic-logo.png"
+    },
+    {
+      "id": "menuGroup",
+      "_type": "Group",
+      "translation": [1000, 47],
+      "_children": [
+        {
+          "id": "buttonsGroup",
+          "_type": "mv_ControlsGroup",
+          "translation": [0, 0],
+          "layoutMode": "horiz",
+          "keyDirection": "horiz",
+          "itemSpacings": [30],
+          "_initializeAfterCreatingChildren": true
+        }
+      ]
+    }
+  ]
+}

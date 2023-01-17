@@ -1,0 +1,97 @@
+import "pkg:/source/roku_modules/maestro/view/debug/DeveloperScreen.brs"
+import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
+namespace main
+  @node("DeveloperScreen", "mv_DeveloperScreen")
+  class DeveloperScreen extends mv.debug.DeveloperScreen
+
+    private views = []
+    private navMenu as mc.types.node
+    private currentMenuItem as mc.types.node
+    private tabController as mc.types.node
+
+    protected override function initialize()
+      super.initialize()
+
+      m.configureNavMenu()
+      m.tabController = m.createSGNode("mv_TabController", m.top, "tabController")
+      m.setInstance("appController", m.top)
+
+    end function
+
+    protected override function createMenuPages() as mc.types.array
+      return [
+        m.getDefaultPage()
+        m.getPage2()
+        m.getPage3()
+        m.getPage4()
+      ]
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Pages
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    protected function getPage3()
+      return [
+        ["Buttons", function(): m.showScreen(m.createSGNode("ButtonScreen")): end function]
+        ["ControlGroup", function(): m.showScreen(m.createSGNode("ControlGroupScreen")): end function]
+        ["TextInput", function(): m.showScreen(m.createSGNode("TextInputScreen")): end function]
+        ["Task Runner", function(): m.showScreen(m.createSGNode("TaskRunnerScreen")): end function]
+
+        ["Timer", function(): m.showScreen(m.createSGNode("TimerScreen")): end function]
+      ]
+    end function
+
+    protected function getPage4()
+      return [
+        ["GridRow bug", function(): m.showScreen(m.createSGNode("ModuleScreen")): end function]
+        ["Notification Screen", function(): m.showScreen(m.createSGNode("NotificationScreen")): end function]
+        ["NavController", function(): m.showScreen(m.createSGNode("NavControllerTestScreen")): end function]
+        ["Tab Controller", function(): m.showScreen(m.createSGNode("TabControllerTestScreen")): end function]
+        ["Dynamic Container", function(): m.showScreen(m.createSGNode("DynamicContainerTestScreen")): end function]
+        ["Animations", function(): m.showScreen(m.createSGNode("AnimationScreen")): end function]
+        ["Advanced Animations", function(): m.showScreen(m.createSGNode("AdvancedAnimationExampleScreen")): end function]
+      ]
+    end function
+    protected function getPage2()
+      return [
+        ["Home screen sample ", function(): m.showScreen(m.createSGNode("HomeScreen")): end function]
+        ["Disney Inspired Hero ", function(): m.showScreen(m.createSGNode("DisneyHeroScreen")): end function]
+        ["List OnEnterOnExit", function(): m.showScreen(m.createSGNode("ListEnterExitScreen")): end function]
+        ["List ", function(): m.showScreen(m.createSGNode("ListScreen")): end function]
+        ["List Editing (team screen)", function(): m.showScreen(m.createSGNode("TeamScreen")): end function]
+        ["Grid Item JumpToItem", function(): m.showScreen(m.createSGNode("FocusOnGridItemScreen")): end function]
+        ["Grid Item Moving", function(): m.showScreen(m.createSGNode("UpdateGridItemsScreen")): end function]
+        ["RowList", function(): m.showScreen(m.createSGNode("RowListScreen")): end function]
+        ["List Updates", function(): m.showScreen(m.createSGNode("UpdateListDataScreen")): end function]
+        ["Mixed list screen", function(): m.showScreen(m.createSGNode("MixedListScreen")): end function]
+
+      ]
+    end function
+
+    private function configureNavMenu()
+      if m.navMenu = invalid
+        m.navMenu = m.createSGNode("TopMenu", m.top, "topMenu", {
+          observe: {
+            "selectedIndex": m.onMenuItemChange
+          }
+        })
+      end if
+      m.navMenu.visible = false
+      bundle = m.styleManager@.loadBundle("pkg:/source/main/view/TopMenu.bundle")
+      m.navMenu@.setItems(bundle.menuItems)
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    private function onMenuItemChange(index as integer)
+      m.log.info("selected tab item", index)
+      m.currentMenuItem = m.navMenu@.getItems()[index]
+      m.tabController@.changeCurrentItem(m.currentMenuItem)
+      m.setFocus(m.tabController)
+    end function
+
+  end class
+end namespace

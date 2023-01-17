@@ -1,10 +1,17 @@
 {
-  "stagingFolderPath": "/tmp/out",
+  "stagingFolderPath": "build",
   "rootDir": "src",
   "files": [
+    "!**/*.i8n.json",
     "manifest",
     "source/**/*.*",
-    "components/**/*.*"
+    "images/**/*.*",
+    "sounds/**/*.*",
+    "sounds/*.*",
+    "fonts/**/*.*",
+    "meta/**/*.*",
+    "components/**/*.*",
+    "source/tests/**/*.*"
   ],
   "autoImportComponentScript": true,
   "createPackage": false,
@@ -13,34 +20,53 @@
       "src": "**/roku_modules/**/*.*"
     },
     {
-      "src": "**/WhiteList.xml",
-      "codes": [
-        1067
-      ]
-    }
+      "src": "node_modules/**/*.*"
+    },
+    {
+      "src": "**/maestro/**/*.*"
+    },
+    {
+      "src": "**/RALETrackerTask.*"
+    },
+    {
+      "src": "**/*spec.bs",
+      "codes": ["LINT3011"]
+    },
+    1128
   ],
   "plugins": [
-    "/home/george/hope/open-source/maestro/maestro-roku-bsc-plugin/dist/plugin.js"
+    "maestro-roku-bsc-plugin",
+    "rooibos-roku",
+    "roku-log-bsc-plugin",
+    "@rokucommunity/bslint"
   ],
-  "ignore": [
-    "/home/george/hope/open-source/roku-log/roku-log-bsc-plugin/dist/plugin.js",
-    "/home/george/hope/open-source/rooibos/bsc-plugin/dist/plugin.js"
-  ],
+  "maestro": {
+    "excludeFilters": [
+      "**/RALETrackerTask.*",
+      "**/roku_modules/**/*",
+      "**/node_modules/**/*",
+      "**/rooibos/**/*"
+    ],
+    "buildForIDE": true,
+    "extraValidation": {
+      "doExtraValidation": true,
+      "doExtraImportValidation": true,
+      "excludeFilters": []
+    }
+  },
   "rooibos": {
     "isRecordingCodeCoverage": false,
     "testsFilePattern": null
   },
-  "maestro": {
-    "buildTimeImports": {
-      "IAuthProvider": [],
-      "IEntitlementsProvider": [],
-      "IBookmarksProvider": [],
-      "IPlayerAnalytics": [],
-      "IAnalytics": []
-    }
-  },
   "rokuLog": {
     "strip": false,
-    "insertPkgPath": true
-  }
+    "insertPkgPath": true,
+    "removeComments": true
+  },
+  "logLevel": "error",
+  "retainStagingFolder": true,
+  "transpileOptions": {
+    "removeParameterTypes": true
+  },
+  "sourceMap": true
 }

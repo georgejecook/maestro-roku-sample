@@ -6,10 +6,12 @@
     "**/.git/objects/**",
     ".vscode",
     "dist",
-    "build",
+    "build"
   ],
   "files.exclude": {
     "build": true,
+    "ci-build": true,
+    "build-scripts": true,
     ".history": true,
     "node_modules": true,
     "out": true,
@@ -20,6 +22,7 @@
     "/tmp/**": true,
     "**/dist": true,
     "**/build": true,
+    "**/ci-build": true,
     "**/out": true
   },
   "search.exclude": {
@@ -28,7 +31,11 @@
     "**/node_modules/**": true,
     "**/.meteor/local": true,
     "**/build/**": true,
+    "**/ci-build/**": true,
+    "build-scripts/**": true,
+    "**/build-scripts/**": true,
     "build/**": true,
+    "ci-build/**": true,
     "**/.history/**": true,
     ".history/**": true,
     ".history/**/*": true,
@@ -46,12 +53,121 @@
     "**/node_modules/**": true,
     "**/.meteor/local": true,
     "**/build/**": true,
+    "**/build-scripts/**": true,
     "**/.history/**": true,
     ".history/**": true,
     "**/out/**": true,
     "**/dist": true,
     "**/build": true,
+    "**/ci-build": true,
     "**/out": true
   },
-
+  "xml.fileAssociations": [
+    {
+      "systemId": ".vscode/project.xsd",
+      "pattern": "**/*.xml"
+    }
+  ],
+  "xml.format.splitAttributes": true,
+  "xml.validation.enabled": false,
+  "xml.format.preserveEmptyContent": true,
+  "xml.preferences.quoteStyle": "single",
+  "xml.format.enforceQuoteStyle": "preferred",
+  "editor.tabSize": 4,
+  "[brightscript]": {
+    "editor.tabSize": 2
+  },
+  "[brighterscript]": {
+    "editor.tabSize": 2
+  },
+  "[xml]": {
+    "editor.tabSize": 2
+  },
+  "editor.insertSpaces": true,
+  "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+  "files.trimTrailingWhitespace": true,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#FF4658",
+    "statusBar.debuggingBackground": "#932b35",
+    "panelTitle.activeBorder": "#ff0000",
+    "activityBar.background": "#304f7d",
+    "titleBar.activeBackground": "#6A9CE6",
+    "titleBar.activeForeground": "#FAFBFE"
+  },
+  "launches": {
+    "Run": "Run"
+  },
+  "eslint.validate": ["javascript", "typescript"],
+  "eslint.format.enable": true,
+  // "eslint.format.enable": true
+  "gotoNextPreviousMember.symbolKinds": [
+    "constructor",
+    "function",
+    "method",
+    "module",
+    "namespace",
+    "class",
+    "struct",
+    "interface"
+  ],
+  "cSpell.enabledLanguageIds": [
+    "brightscript",
+    "javascript",
+    "markdown",
+    "plaintext",
+    "text",
+    "typescript",
+    "yml",
+    "brighterscript"
+  ],
+  "brightscript.output.clearOnLaunch": true,
+  "brightscript.output.focusOnLaunch": true,
+  "brightscript.format.removeTrailingWhiteSpace": false,
+  "brightscript.output.includeStackTraces": true,
+  "brightscript.debug.enableDebugProtocol": false,
+  "brightscript.outputPanelStartupBehavior": "focus",
+  "brightscript.format.keywordCase": "lower",
+  "brightscript.enableLanguageServer": true,
+  "brightscript.deviceDiscovery.enabled": false,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "meta.function-call.brs,punctuation.decorator.brs",
+        "settings": {
+          "foreground": "#34BEB0",
+          "fontStyle": ""
+        }
+      }
+    ]
+  },
+  "brightscript.bsdk": "node_modules/brighterscript",
+  "macros": {
+    "restart": [
+      "extension.maestro.navigation.updateTDDTarget",
+      "workbench.action.debug.stop",
+      "workbench.action.debug.start"
+    ]
+  },
+  "cx.server": {
+    "url": "https://checkmarx.robot-hq.com/",
+    "alias": "robot",
+    "username": "",
+    "password": "",
+    "project_id": 0,
+    "team_id": 0,
+    "project_name": ""
+  }
 }
