@@ -77,16 +77,20 @@ class DetailsHeaderRow extends ml.BaseRow
 
   private function addToFavorites()
     m.log.info("Adding item to favorites")
-    m.favoriteButton.text = "Remove from favorites"
+    iconStyle = m.favoriteButton.iconStyle
+    iconStyle.uri = "pkg:/images/fav-icon-filled.png"
+    m.favoriteButton.iconStyle = iconStyle
     m.isFavorite = true
   end function
 
   private function removeFromFavorites()
     m.log.info("Removing item from favorites")
-
-    m.favoriteButton.text = "Add to favorites"
+    iconStyle = m.favoriteButton.iconStyle
+    iconStyle.uri = "pkg:/images/fav-icon.png"
+    m.favoriteButton.iconStyle = iconStyle
     m.isFavorite = false
   end function
+
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Row Delegate Methods

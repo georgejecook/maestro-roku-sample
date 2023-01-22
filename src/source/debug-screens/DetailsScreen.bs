@@ -5,7 +5,7 @@ import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
 import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 
 
-namespace spectrum.view
+namespace sample.debug.screens
   @node("DetailsScreen", "mv_BaseScreen")
   class DetailsScreen extends mv.BaseScreen
 
@@ -105,14 +105,17 @@ namespace spectrum.view
 
     private function addToFavorites()
       m.log.info("Adding item to favorites")
-      m.favoriteButton.text = "Remove from favorites"
+      iconStyle = m.favoriteButton.iconStyle
+      iconStyle.uri = "pkg:/images/fav-icon-filled.png"
+      m.favoriteButton.iconStyle = iconStyle
       m.isFavorite = true
     end function
 
     private function removeFromFavorites()
       m.log.info("Removing item from favorites")
-
-      m.favoriteButton.text = "Add to favorites"
+      iconStyle = m.favoriteButton.iconStyle
+      iconStyle.uri = "pkg:/images/fav-icon.png"
+      m.favoriteButton.iconStyle = iconStyle
       m.isFavorite = false
     end function
 

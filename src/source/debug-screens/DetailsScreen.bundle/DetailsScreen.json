@@ -4,7 +4,7 @@
       "id": "backgroundRectangle",
       "_type": "mv_Rectangle",
       "size": [1920, 1080],
-      "color": "~styles.colors.general.grey"
+      "color": "~colors.general.grey"
     },
     {
       "id": "mainGroup",
@@ -32,7 +32,7 @@
         {
           "id": "rectangle",
           "_type": "mv_Rectangle",
-          "size": [700, 50],
+          "size": [700, 80],
           "color": "#ffffff",
           "translation": [1200, 0],
           "_children": [
@@ -78,7 +78,7 @@
               "translation": [0, 180],
               "fontKey": "~fonts.body-06",
               "text": "Foundation and Empire",
-              "color": "~styles.colors.general.white",
+              "color": "~colors.general.white",
               "size": [1200, 0],
               "wrap": true,
               "maxLines": 8,
@@ -97,19 +97,21 @@
                   "id": "playButton",
                   "_type": "mv_Button",
                   "iconStyle": "~icons.play",
+                  "styleKey": "buttons.general",
                   "text": "Play",
                   "autoSize": true,
                   "iconPosition": "centerLeft",
                   "size": [265, 88]
                 },
-
                 {
                   "id": "favoriteButton",
                   "_type": "mv_Button",
                   "iconStyle": "~icons.favorite",
-                  "iconPosition": "centerLeft",
-                  "text": "Add to favorites",
-                  "autoSize": true
+                  "styleKey": "buttons.general",
+                  "text": "",
+                  "autoSize": true,
+                  "iconPosition": "center",
+                  "size": [100, 88]
                 }
               ]
             }

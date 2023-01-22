@@ -47,7 +47,7 @@ namespace sample.view
     end function
 
     private function createViews()
-      json = m.styleManager@.loadBundle("pkg:/source/main/view/TopMenu.bundle")
+      json = m.styleManager@.loadBundle("pkg:/source/main/view/menu/TopMenu.bundle")
 
       m.createViewsFromStyleJson(json.views)
 

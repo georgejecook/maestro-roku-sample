@@ -101,14 +101,15 @@
                   "iconPosition": "centerLeft",
                   "size": [265, 88]
                 },
-
                 {
                   "id": "favoriteButton",
                   "_type": "mv_Button",
+                  "iconStyle": "~icons.favorite",
                   "styleKey": "buttons.general",
-                  "text": "Add to favorites",
+                  "text": "",
                   "autoSize": true,
-                  "size": [350, 88]
+                  "iconPosition": "center",
+                  "size": [100, 88]
                 }
               ]
             }

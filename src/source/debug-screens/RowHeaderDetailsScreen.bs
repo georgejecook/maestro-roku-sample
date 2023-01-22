@@ -5,7 +5,7 @@ import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
 import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 
 
-namespace spectrum.view
+namespace sample.debug.screens
   @node("RowHeaderDetailsScreen", "mv_BaseScreen")
   class RowHeaderDetailsScreen extends mv.BaseScreen
 

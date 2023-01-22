@@ -25,6 +25,8 @@ class SearchScreen extends mv.BaseScreen
   private cellSettings as mc.types.node
   private focusSettings as mc.types.node
 
+  @inject("appController")
+  private appController
 
   function new()
     super("SearchScreen")
@@ -209,6 +211,17 @@ class SearchScreen extends mv.BaseScreen
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ List Delegate Methods
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  private function onItemSelected(event as ml.ListEvent)
+    item = m.list@.getItem(event.rowIndex, event.cellIndex)
+    m.log.info("selected item", mc.dv(item))
+    selection = m.createSelection(item, "display", {}, "detailsScreen")
+    m.executeSelection(selection)
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Lifecycle Methods
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   protected override function onGainedFocus(isSelfFocused as boolean)
@@ -218,6 +231,12 @@ class SearchScreen extends mv.BaseScreen
     if isSelfFocused
       m.setFocus(m.keyboard)
     end if
+  end function
+
+  protected override function onShow()
+    m.log.info("onShow")
+    super.onShow()
+    m.appController@.setTopMenuVisible(true)
   end function
 
   protected override function cleanup()

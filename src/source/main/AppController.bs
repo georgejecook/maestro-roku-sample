@@ -95,19 +95,30 @@ namespace mc.sample
     end function
 
     private function configureNavMenu()
+      useSideMenu = m.top.useSideMenu
       if m.navMenu = invalid
-        m.navMenu = m.createSGNode("TopMenu", m.top, "topMenu", {
-          observe: {
-            selectedIndex: m.onMenuItemChange,
-          }
-        })
+        if not asBoolean(useSideMenu)
+          m.navMenu = m.createSGNode("TopMenu", m.top, "topMenu", {
+            observe: {
+              selectedIndex: m.onMenuItemChange,
+            }
+          })
+          bundle = m.styleManager@.loadBundle("pkg:/source/main/view/menu/TopMenu.bundle")
+        else
+          m.navMenu = m.createSGNode("SideMenu", m.top, "sideMenu", {
+            observe: {
+              selectedIndex: m.onMenuItemChange,
+            }
+          })
+          bundle = m.styleManager@.loadBundle("pkg:/source/main/view/menu/SideMenu.bundle")
+        end if
+        m.navMenu@.setItems(bundle.items)
       end if
-      bundle = m.styleManager@.loadBundle("pkg:/source/main/view/TopMenu.bundle")
-      m.navMenu@.setItems(bundle.menuItems)
+
     end function
 
     function setTopMenuVisible(visible as boolean)
-      m.log.info("setting side menu visible", visible)
+      m.log.info("setting top menu visible", visible)
 
       if m.navMenu <> invalid
         m.navMenu.visible = visible
@@ -121,6 +132,13 @@ namespace mc.sample
     public function setFocusOnContent(focusOnContent as boolean, animated = true as boolean)
       m.isFocusedOnContent = focusOnContent
       m.setFocus(focusOnContent ? m.tabController : m.navMenu)
+    end function
+
+    function setSideMenuExpanded(expanded as boolean)
+      m.log.info("setting side menu expanded", expanded)
+
+      m.navMenu@.setState(expanded ? "expanded" : "collapsed")
+      m.setFocus(m.navMenu)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -157,6 +175,19 @@ namespace mc.sample
       end if
       return false
     end function
+
+    protected override function onKeyPressLeft() as boolean
+      m.setFocusOnContent(false)
+      m.setSideMenuExpanded(true)
+      return false
+    end function
+
+    protected override function onKeyPressRight() as boolean
+      m.setFocusOnContent(true)
+      m.setSideMenuExpanded(false)
+      return false
+    end function
+
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ LifeCycle Methods
