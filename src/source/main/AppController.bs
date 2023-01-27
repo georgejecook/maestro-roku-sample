@@ -183,8 +183,11 @@ namespace mc.sample
     end function
 
     protected override function onKeyPressRight() as boolean
-      m.setFocusOnContent(true)
-      m.setSideMenuExpanded(false)
+      if m.navMenu.visible and not m.isFocusedOnContent
+        m.setSideMenuExpanded(false)
+        m.log.info("focusing on content")
+        m.setFocusOnContent(true)
+      end if
       return false
     end function
 

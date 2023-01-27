@@ -28,7 +28,7 @@ namespace sample.view
 
     private logo as mc.types.node
 
-    private buttonSize = [350, 64]
+    private buttonSize = [200, 64]
 
     private homeButtonSize = [80, 64]
 
@@ -90,7 +90,7 @@ namespace sample.view
           m.iconStyle.focused.uri = `pkg:/images/menu/${item.id}-icon.png`
 
           m.createSGNode("mv_Button", m.buttonsGroup, `${item.id}-button`, {
-            styleKey: "mv.Button.default",
+            styleKey: "buttons.sideMenu",
             size: size,
             iconStyle: m.iconStyle
             text: `${item.title}`,
@@ -151,6 +151,16 @@ namespace sample.view
         m.onLostFocus()
       end if
       return false
+    end function
+
+    private function onKeyPressRight() as boolean
+      m.log.info("On key press right")
+      return true
+    end function
+
+    private function onKeyPressLeft() as boolean
+      m.log.info("On key press left")
+      return true
     end function
 
   end class

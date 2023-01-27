@@ -144,7 +144,7 @@
       "normal": {
         "label": {
           "fontKey": "~fonts.body-04",
-          "color": "~colors.general.black",
+          "color": "~colors.general.white",
           "translation": [20, 0],
           "size": [300, 60],
           "vertAlign": "center"
@@ -159,10 +159,10 @@
         },
         "backgroundPoster": {
           "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
-          "blendColor": "#ffffff"
+          "blendColor": "#6699CC06"
         },
         "iconPoster": {
-          "blendColor": "#ffffff",
+          "blendColor": "~colors.general.white",
           "size": [0, 0],
           "translation": [0, 0]
         }
@@ -171,7 +171,7 @@
         "label": {
           "size": [300, 60],
           "fontKey": "~fonts.title-04",
-          "color": "#ffffff"
+          "color": "~colors.general.white"
         },
         "subtextLabel": {
           "fontKey": "~fonts.title-04",
@@ -209,7 +209,7 @@
       "selected": {
         "label": {
           "fontKey": "~fonts.title-04",
-          "color": "~colors.general.black"
+          "color": "~colors.general.white"
         },
         "subtextLabel": {
           "fontKey": "~fonts.title-04",
@@ -220,7 +220,7 @@
           "blendColor": "#6699CC"
         },
         "iconPoster": {
-          "blendColor": "#6699CC"
+          "blendColor": "~colors.general.white"
         }
       }
     }

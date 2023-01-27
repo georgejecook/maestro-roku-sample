@@ -263,10 +263,16 @@ class SearchScreen extends mv.BaseScreen
   end function
 
   private function onKeyPressUp() as boolean
+    if asBoolean(m.appController.useSideMenu)
+      return true
+    end if
     return false
   end function
 
   private function onKeyPressDown() as boolean
+    if asBoolean(m.appController.useSideMenu)
+      return true
+    end if
     return false
   end function
 

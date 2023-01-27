@@ -62,13 +62,7 @@ namespace sample.main.view
       m.createViewsFromStyleJson(json.views)
 
       m.iconStyle = json.styles.icons.default
-      m.collapsedButtonSize[0] = m.iconStyle.normal.size[0] + 10
-
-      innerPadding = asPoint(json.styles.focusIndicator.innerPadding)
-      m.focusIndicator.addFields({ "innerPadding": innerPadding })
-
-      m.focusIndicator.width = m.expandedButtonSize[0] + m.focusIndicator.innerPadding[0]
-      m.focusIndicator.height = m.expandedButtonSize[1] + m.focusIndicator.innerPadding[1]
+      m.collapsedButtonSize[0] = m.iconStyle.normal.size[0] + 30
 
       m.observe(m.buttonsGroup.focusedIndex, m.onMenuIndexChanged)
       m.observe(m.buttonsGroup.selectedIndex, m.onMenuItemSelected)
@@ -124,8 +118,8 @@ namespace sample.main.view
         focusedButton = m.buttonsGroup.getChild(m.focusedIndex)
         if m.focusAnimation <> invalid
           newTranslation = [
-            m.buttonsGroup.translation[0] - m.focusIndicator.innerPadding[0] / 2,
-            m.buttonsGroup.translation[1] + focusedButton.translation[1] - m.focusIndicator.innerPadding[1] / 2
+            m.buttonsGroup.translation[0]
+            m.buttonsGroup.translation[1] + focusedButton.translation[1]
           ]
           m.focusAnimation.animateTo(newTranslation)
         end if
@@ -138,15 +132,8 @@ namespace sample.main.view
       else
         m.bgRect.size = [m.buttonsGroup.translation[0] * 2 + size[0], m.bgRect.size[1]]
       end if
-      m.updateFocusIndicator()
     end function
 
-    private function updateFocusIndicator()
-      if m.focusIndicator.visible
-        m.focusIndicator.width = m.expandedButtonSize[0] + m.focusIndicator.innerPadding[0]
-        m.focusIndicator.height = m.expandedButtonSize[1] + m.focusIndicator.innerPadding[1]
-      end if
-    end function
 
     private function expandMenu(expand as boolean, animate = true as boolean)
       if expand = true

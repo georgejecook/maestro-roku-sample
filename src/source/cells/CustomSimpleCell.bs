@@ -49,7 +49,7 @@ namespace sample
 
     private function setScale(fraction as float, isGaining as boolean) as void
       if isGaining
-        m.scale = mc.clamp((fraction + 0.8), 0.85, 1.1)
+        m.scale = mc.clamp((fraction + 0.9), 0.85, 1.1)
       else
         m.scale = mc.clamp((1 - fraction) + 0.3, 0.85, 1.1)
       end if
@@ -100,6 +100,7 @@ namespace sample
 
     private function onLosingFocus(event as ml.ListEvent)
       m.setScale(event.fraction, false)
+      m.toggleHighlighted(true)
     end function
   end class
 end namespace
