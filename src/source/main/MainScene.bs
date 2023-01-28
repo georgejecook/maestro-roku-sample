@@ -153,12 +153,14 @@ namespace mc.sample
     end function
 
     private function showAppController()
+      useSideMenu = asBoolean(m.developerScreen.sideMenu)
       if m.developerScreen <> invalid
         m.top.removeChild(m.developerScreen)
         m.developerScreen = invalid
         m.loadingIndicator.isActive = true
       end if
       m.top._appController = createObject("roSGNode", "AppController")
+      mc.setOrAddNodeField(m.top._appController, "useSideMenu", useSideMenu)
       mioc.setInstance("appController", m.top._appController)
       m.top.insertChild(m.top._appController, 1)
       m.top._appController@._initialize()

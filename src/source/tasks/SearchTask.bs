@@ -1,0 +1,40 @@
+import "pkg:/source/roku_modules/maestro/core/BaseClass.brs"
+import "pkg:/source/roku_modules/maestro/core/Result.brs"
+
+
+@task("SearchTask", "Task")
+class SearchTask extends mc.BaseClass
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ Initialization
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function new()
+    super("SearchTask")
+  end function
+
+  private function execute(args as mc.types.assocarray)
+    m.log.info("executing task with args", args)
+    try
+      'make api call for search with args.searchText
+      result = m.makeMockItems()
+      return mc.Result(true, result)
+    catch error
+      m.log.error("error occurred while searching", error)
+    end try
+    return mc.Result(false, invalid, "error occurred while searching")
+  end function
+
+  private function makeMockItems()
+    items = []
+    for i = 0 to rnd(10)
+      item = { title: `Item ${i}`
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam lorem id ante feugiat fermentum. Proin mi erat, pretium at ante at, condimentum porta lacus. Proin hendrerit tincidunt risus blandit gravida. Duis imperdiet, nulla ut maximus viverra, magna nulla tristique diam, eget rhoncus eros sem quis magna. Quisque viverra ultricies sem ac dictum. Cras sit amet lectus eros. Duis lobortis ligula ac sapien pharetra imperdiet. Vestibulum dictum urna quis orci fermentum ultricies ac in orci."
+        posterUrl: "https://picsum.photos/id/" + `/600/400`
+        videoUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8"
+      }
+      items.push(item)
+    end for
+    return items
+  end function
+end class

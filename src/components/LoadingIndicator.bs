@@ -1,7 +1,7 @@
-'FIXME(Daci) - rewrite this as a node class - see Button for pattern.
 
 function init()
   m.image.observeField("loadStatus", "omImageLoadStatusChange")
+  m.image.blendColor = "#adc6dd"
   m.rotationAnimationInterpolator.key = [1, 0]
   m.top.visible = false
   m.top.control = "stop"

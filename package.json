@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "log": "npm:roku-log@^0.9.3",
-    "maestro": "npm:maestro-roku@0.54.7"
+    "maestro": "npm:maestro-roku@0.54.8"
   },
   "devDependencies": {
     "@rokucommunity/bslint": "0.7.1",

@@ -6,118 +6,66 @@ import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 
 
 namespace sample.debug.screens
-  @node("DetailsScreen", "mv_BaseScreen")
-  class DetailsScreen extends mv.BaseScreen
+  @node("RowHeaderDetailsScreen", "mv_BaseScreen")
+  class RowHeaderDetailsScreen extends mv.BaseScreen
 
     private bgRect as mc.types.node
-
-    private titleLabel as mc.types.node
-    private descriptionLabel as mc.types.node
-    private backgroundPoster as mc.types.node
     private loadingIndicator as mc.types.node
     private list as mc.types.node
 
-    private buttonsGroup as mc.types.node
-    private playButton as mc.types.node
-    private favoriteButton as mc.types.node
-    private infoContainer as mc.types.node
-    private mainGroup as mc.types.node
-
-    private isFavorite = false
-
     private rowSettings as mc.types.node
 
+    private isFavorite = false
 
     @inject("appController")
     private appController
 
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ Private Fields
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    private mainGroupAnimation as mc.types.node
-    private listAnimation as mc.types.node
-
-    private infoContainerTranslation = [0, 0]
-    private listTranslation = [0, 0]
-    private rowVisibleOnScreen = false
+    private selectedButton as mc.types.node
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ Initialization
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     function new()
-      super("DetailsScreen")
+      super("RowHeaderDetailsScreen")
     end function
 
     protected override function initialize()
-      m.log.info("Initialized DetailsScreen")
+      m.log.info("Initialized RowHeaderDetailsScreen")
       super.initialize()
 
       m.createViews()
 
-      m.mainGroupAnimation = new mv.animations.Move(m.mainGroup, 0.3, m.mainGroup.translation, m.mainGroup.translation)
-      m.mainGroupAnimation.start()
-
-      m.listAnimation = new mv.animations.Move(m.list, 0.3, m.list.translation, m.list.translation)
-      m.listAnimation.start()
-
       if asNode(m.originSelection.initialItem) <> invalid
         m.setListContent()
       end if
-
-      m.observe(m.buttonsGroup.selectedIndex, m.onButtonsGroupSelectedIndex)
     end function
 
     private function createViews()
-      json = m.styleManager@.loadBundle("pkg:/source/debug-screens/DetailsScreen.bundle")
-      m.createViewsFromStyleJson(json.views)
+      m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
+        translation: [0, 0]
+        size: [1920, 1080]
+        color: "#bebebe"
+      })
 
-      m.listTranslation = m.list.translation
-      m.infoContainerTranslation = m.infoContainer.translation
-      if m.originSelection <> invalid
-        m.updateDetails()
-      end if
+      listHolder = m.createSGNode("Group", m.top, "listHolder")
+      m.list = m.createSGNode("ml_List", listHolder, "list", {
+        translation: [0, 0]
+        width: 1920
+        height: 1080
+      })
+      m.loadingIndicator = m.createSGNode("LoadingIndicator", m.top, "loadingIndicator", {
+        isActive: true
+        width: 1920
+        height: 1080
+        backgroundVisible: false
+      })
+
     end function
-
-    private function updateDetails()
-      json = m.originSelection.currentItem.json
-      m.titleLabel.text = asString(json.title)
-      m.backgroundPoster.uri = asString(json.posterUrl)
-      m.descriptionLabel.text = asString(json.description, "")
-    end function
-
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ Private Methods
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    private function resetButtonSelectedState(index as integer)
-      m.buttonsGroup.getChild(index).isSelected = false
-    end function
-
-    private function onPlaySelected()
-      m.log.info("Play button selected")
-      selection = m.createSelection(m.originSelection.currentItem, "play")
-      m.executeSelection(selection)
-    end function
-
-
-    private function addToFavorites()
-      m.log.info("Adding item to favorites")
-      iconStyle = m.favoriteButton.iconStyle
-      iconStyle.uri = "pkg:/images/fav-icon-filled.png"
-      m.favoriteButton.iconStyle = iconStyle
-      m.isFavorite = true
-    end function
-
-    private function removeFromFavorites()
-      m.log.info("Removing item from favorites")
-      iconStyle = m.favoriteButton.iconStyle
-      iconStyle.uri = "pkg:/images/fav-icon.png"
-      m.favoriteButton.iconStyle = iconStyle
-      m.isFavorite = false
-    end function
 
     private function setListContent()
       m.log.info("setting list content")
@@ -129,11 +77,12 @@ namespace sample.debug.screens
       focusSettings = ml.listMixin.createFocusSettings("fixed")
       focusSettings.feedbackStyle = "none"
 
-      headerSettings = ml.listMixin.createHeaderSettings([10, 30], 80, "mediumBold,30", "#000000")
+      headerSettings = ml.listMixin.createHeaderSettings([90, 30], 80, "mediumBold,30", "#000000")
       m.rowSettings = ml.listMixin.createRowSettings(cellSettings, focusSettings, 10, headerSettings, -1, "ml_HorizontalRow", 250)
       m.rowSettings.numberItemsToRenderBefore = 10
       m.rowSettings.numberItemsToRenderAfter = 10
       m.rowSettings.screenPos = 300
+      m.rowSettings.contentOffset = [90, 200]
 
       listSettings = m.createListSettings()
       content = ml.listMixin.createListContent(focusSettings, m.rowSettings, listSettings)
@@ -144,9 +93,13 @@ namespace sample.debug.screens
       m.setFocus(m.loadingIndicator)
 
       content@.setNotificationsEnabled(false)
-      content@.appendChild(m.makeRelatedRow())
+      content@.appendChildren(m.makeRows())
 
       m.list@.setContent(content)
+
+      row = m.list@.getRowRenderer(0)
+      row@.setItem(asAA(m.originSelection.currentItem))
+
       m.list.delegate = m.top
 
       if m.list.state = "rendered"
@@ -157,6 +110,10 @@ namespace sample.debug.screens
       end if
     end function
 
+    private function makeRows()
+      return [m.makeDetailsHeaderRow(), m.makeRelatedRow()]
+    end function
+
     private function makeRelatedRow()
       row = createObject("roSGNode", "ml_RowContent")
       row.settings = m.rowSettings
@@ -164,6 +121,15 @@ namespace sample.debug.screens
       numItems = 20
       row.title = "Related"
       row@.appendChildren(m.makeItems(numItems))
+      return row
+    end function
+
+    private function makeDetailsHeaderRow()
+      row = createObject("roSGNode", "ml_RowContent")
+      row.id = rnd(2147483647).toStr()
+      row.settings = ml.listMixin.createCustomRowSettings("DetailsHeaderRow", 500)
+      row.settings.headerSettings.position = "none"
+      row.title = ""
       return row
     end function
 
@@ -205,24 +171,6 @@ namespace sample.debug.screens
     '++ Callbacks
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    private function onButtonsGroupSelectedIndex(index as integer)
-      m.log.info("selected button", index)
-      button = m.buttonsGroup@.getSelectedButton()
-
-      if m.playButton.isSameNode(button)
-        m.onPlaySelected()
-
-      else if m.favoriteButton.isSameNode(button)
-        if m.isFavorite
-          m.removeFromFavorites()
-        else
-          m.addToFavorites()
-        end if
-      end if
-
-      m.resetButtonSelectedState(index)
-    end function
-
     private function onListRenderState(state as string)
       m.log.info("onListRenderState", state)
       if state = "rendered"
@@ -241,51 +189,11 @@ namespace sample.debug.screens
       item = m.list@.getItem(event.rowIndex, event.cellIndex)
 
       m.log.info("Selected Item", mc.dv(item))
-      selection = m.createSelection(item, "display", "detailsScreen")
+      selection = m.createSelection(item, "display", {}, "RowHeaderDetailsScreen")
 
       m.executeSelection(selection)
     end function
 
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ Key Presses
-    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    private function onKeyPressDown() as boolean
-      m.log.info("On key press down")
-
-      if not m.rowVisibleOnScreen
-        m.showRow(true)
-        m.setFocus(m.list)
-        m.list@.moveToRowItemIndex(0, m.list.focusedCellIndex)
-        return true
-      end if
-
-      return false
-    end function
-
-    private function onKeyPressUp() as boolean
-      m.log.info("On key press up")
-      if m.isControlFocused(m.list)
-        m.showRow(false)
-        m.setFocus(m.buttonsGroup)
-        return true
-      end if
-      return false
-    end function
-
-    private function showRow(show as boolean)
-      if show
-        m.log.info("Moving info container, showing list")
-        m.rowVisibleOnScreen = true
-        m.mainGroupAnimation.animateTo([m.mainGroup.translation[0], m.mainGroup.translation[1] - 800], 0.2)
-        m.listAnimation.animateTo([m.list.translation[0], m.list.translation[1] - 700], 0.2)
-      else
-        m.log.info("Moving list, showing info container")
-        m.rowVisibleOnScreen = false
-        m.mainGroupAnimation.animateTo([0, 0], 0.1)
-        m.listAnimation.animateTo(m.listTranslation, 0.1)
-      end if
-    end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     '++ Lifecycle Methods
@@ -295,7 +203,7 @@ namespace sample.debug.screens
       super.onShow()
       m.appController@.setTopMenuVisible(false)
       m.log.info("showing details screen for item", mc.dv(asNode(m.originSelection.initialItem)))
-      m.setFocus(m.buttonsGroup)
+      m.setFocus(m.list)
     end function
 
     protected override function onFirstShow()
@@ -308,17 +216,6 @@ namespace sample.debug.screens
       m.log.info("On hide")
       super.onHide()
     end function
-
-    protected override function onGainedFocus(isSelfFocused as boolean)
-      super.onGainedFocus(isSelfFocused)
-      m.log.info("gaining focus")
-      if m.rowVisibleOnScreen
-        m.setFocus(m.list)
-      else
-        m.setFocus(m.buttonsGroup)
-      end if
-    end function
-
 
   end class
 end namespace

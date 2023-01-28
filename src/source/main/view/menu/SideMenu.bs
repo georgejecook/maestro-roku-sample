@@ -1,0 +1,238 @@
+import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
+import "pkg:/source/roku_modules/maestro/view/Animation.brs"
+
+namespace sample.main.view
+  @node("SideMenu", "mv_BaseView")
+  class SideMenu extends mv.BaseView
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Public Fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    public focusedIndex = 0
+
+    @alwaysnotify
+    public selectedIndex = 0
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private currentState = "collapsed" 'collapsed|expanded
+
+    private menuGroup as mc.types.node
+    private buttonsGroup as mc.types.node
+    private bgRect as mc.types.node
+
+    private focusIndicator as mc.types.node
+
+    private menuAnimation as mc.types.node
+    private focusAnimation as mc.types.node
+
+    private expandedButtonSize = [240, 60]
+    private collapsedButtonSize = [0, 0]
+    private iconStyle as mc.types.assocarray
+
+    private menuItems = []
+
+    private viewState = "collapsed"
+
+    private logo as mc.types.node
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function new()
+      super("SideMenu")
+    end function
+
+    protected override function initialize() as void
+      super.initialize()
+
+      m.createViews()
+      m.updateMenuClippingRect(m.iconStyle.normal.size[0] + 100)
+      m.createAnimations()
+
+      m.expandMenu(false)
+    end function
+
+    private function createViews()
+      json = m.styleManager@.loadBundle("pkg:/source/main/view/menu/SideMenu.bundle")
+
+      m.createViewsFromStyleJson(json.views)
+
+      m.iconStyle = json.styles.icons.default
+      m.collapsedButtonSize[0] = m.iconStyle.normal.size[0] + 30
+
+      m.observe(m.buttonsGroup.focusedIndex, m.onMenuIndexChanged)
+      m.observe(m.buttonsGroup.selectedIndex, m.onMenuItemSelected)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Public Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public function setState(state as string)
+      m.viewState = state
+      if state = "collapsed"
+        m.expandMenu(false)
+      else if state = "expanded"
+        m.expandMenu(true)
+        m.setFocus(m.buttonsGroup)
+      end if
+    end function
+
+    public function getItems()
+      return m.menuItems
+    end function
+
+    public function setItems(items as mc.types.array)
+      if items.count() > 0
+        for each item in items
+          contentNode = m.createSGNode("ContentNode", invalid, `${item.id}-tab`)
+          mc.setOrAddNodeField(contentNode, "screenType", item.screen)
+
+          m.iconStyle.normal.uri = `pkg:/images/menu/${item.id}-icon.png`
+          m.iconStyle.focused.uri = `pkg:/images/menu/${item.id}-icon.png`
+
+          m.createSGNode("mv_Button", m.buttonsGroup, `${item.id}-button`, {
+            styleKey: "buttons.sideMenu",
+            size: m.expandedButtonSize,
+            iconStyle: m.iconStyle
+            text: `${item.title}`,
+            iconPosition: "left",
+            autoSize: true
+          })
+          m.menuItems.push(contentNode)
+        end for
+        m.buttonsGroup@.updateChildren()
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function moveFocusIndicator()
+      if m.buttonsGroup.getChildCount() > 0
+        focusedButton = m.buttonsGroup.getChild(m.focusedIndex)
+        if m.focusAnimation <> invalid
+          newTranslation = [
+            m.buttonsGroup.translation[0]
+            m.buttonsGroup.translation[1] + focusedButton.translation[1]
+          ]
+          m.focusAnimation.animateTo(newTranslation)
+        end if
+      end if
+    end function
+
+    private function updateMenuLayout(size as mc.types.array, animate = true as boolean)
+      if animate
+        m.menuAnimation.animateToWithSpeed([m.buttonsGroup.translation[0] * 2 + size[0], m.bgRect.size[1]], 0.05)
+      else
+        m.bgRect.size = [m.buttonsGroup.translation[0] * 2 + size[0], m.bgRect.size[1]]
+      end if
+    end function
+
+
+    private function expandMenu(expand as boolean, animate = true as boolean)
+      if expand = true
+        size = m.expandedButtonSize
+        m.logo.size = [200, 182]
+        m.logo.translation = [30, 100]
+      else
+        size = m.collapsedButtonSize
+        m.logo.size = [75, 70]
+        m.logo.translation = [5, m.logo.translation[1]]
+      end if
+      m.updateMenuLayout(size, animate)
+    end function
+
+    private function createAnimations()
+      m.focusAnimation = new mv.animations.Move(m.focusIndicator, 0.1, m.focusIndicator.translation, m.focusIndicator.translation)
+      m.focusAnimation.start()
+
+      m.menuAnimation = new mv.animations.Size(m.bgRect, 0.5, m.bgRect.size, m.bgRect.size)
+      m.menuAnimation.observeFraction(m.onMenuSizeAnimation, m)
+      m.menuAnimation.start()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Callbacks
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onMenuIndexChanged(index as integer) as void
+      m.log.info("focused button index", index)
+      m.focusedIndex = index
+      m.moveFocusIndicator()
+    end function
+
+    private function onMenuItemSelected(index as integer) as void
+      m.setState("collapsed")
+
+      m.selectedIndex = index
+    end function
+
+    private function onMenuSizeAnimation(fraction as float)
+      width = m.collapsedButtonSize[0] + m.buttonsGroup.translation[0]
+      focusIsVisible = false
+      fractionThreshold = 0.3
+      if m.viewState = "expanded"
+        width = m.expandedButtonSize[0] + 100
+        focusIsVisible = true
+        fractionThreshold = 0.7
+      end if
+
+      if fraction > fractionThreshold
+        m.updateMenuClippingRect(width)
+        m.focusIndicator.visible = focusIsVisible
+        m.bgRect.opacity = focusIsVisible ? 0.9 : 0.5
+      end if
+    end function
+
+    private function updateMenuClippingRect(width as float, height = 0 as float, x = 0 as float, y = 0 as float)
+      if height = 0
+        height = m.bgRect.height
+      end if
+      clippingRect = m.buttonsGroup.clippingRect
+      clippingRect["height"] = height
+      clippingRect["width"] = width
+      clippingRect["x"] = x
+      clippingRect["y"] = y
+      m.menuGroup.clippingRect = clippingRect
+      m.focusIndicator.clippingRect = clippingRect
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Lifecycle
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function onGainedFocus(isSelfFocused as boolean)
+      super.onGainedFocus(isSelfFocused)
+      m.log.info("Menu gained focus")
+      m.setFocus(m.buttonsGroup)
+    end function
+
+    protected override function onLostFocus()
+      super.onLostFocus()
+      m.log.info("Menu lost focus")
+    end function
+
+    protected override function onShow()
+      m.log.info("On show")
+      m.moveFocusIndicator()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Key Presses
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function isCapturingAnyKeyPress(key as string, press as boolean) as boolean
+      if key = "up" or key = "down"
+        return true
+      end if
+      return false
+    end function
+
+  end class
+end namespace
