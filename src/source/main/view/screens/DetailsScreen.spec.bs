@@ -1,0 +1,457 @@
+import "pkg:/source/tests/BaseTestSuite.spec.bs"
+import "pkg:/source/main/view/screens/DetailsScreen.bs"
+
+namespace tests
+  @suite("DetailsScreen tests")
+  class DetailsScreenTests extends tests.BaseTestSuite
+    private screen as mc.types.node
+
+    protected override function beforeEach()
+      super.beforeEach()
+      m.screen = m.createNodeClass(sample.view.screens.DetailsScreen)
+      m.screen.loadingIndicator = { "id": "loadingIndicator", isActive: true }
+      m.screen.list = { "id": "list", state: "rendered", translation: [0, 0] }
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("initialize")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it calls createViews, initializes animations, sets list content and sets observers")
+    function _()
+      mainGroupAnimation = { "id": "mainGroupAnimation" }
+      listAnimation = { "id": "listAnimation" }
+      mainGroup = { "id": "mainGroup", "translation": [0, 0] }
+      originSelection = { "id": "originSelection", "initialItem": mc.createSGNode("Item") }
+      buttonsGroup = { "id": "buttonsGroup" }
+
+      m.screen.mainGroupAnimation = mainGroupAnimation
+      m.screen.listAnimation = listAnimation
+      m.screen.mainGroup = mainGroup
+      m.screen.originSelection = originSelection
+      m.screen.buttonsGroup = buttonsGroup
+
+      m.expectCalled(m.screen.createViews())
+
+      m.expectCalled(m.screen.createClassInstance(mv.animations.Move, [m.screen.mainGroup, 0.3, m.screen.mainGroup.translation, m.screen.mainGroup.translation]), mainGroupAnimation)
+      m.expectCalled(m.screen.mainGroupAnimation.start())
+
+      m.expectCalled(m.screen.createClassInstance(mv.animations.Move, [m.screen.list, 0.3, m.screen.list.translation, m.screen.list.translation]), listAnimation)
+      m.expectCalled(m.screen.listAnimation.start())
+
+      m.expectCalled(m.screen.setListContent())
+
+      m.expectCalled(m.screen.observe(m.screen.buttonsGroup.selectedIndex, m.screen.onButtonsGroupSelectedIndex))
+
+      m.screen.initialize()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("createViews")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it creates the views and sets data for the screen")
+    function _()
+      bundle = { "id": "bundle" }
+      originSelection = { "id": "originSelection" }
+      infoContainer = { "id": "infoContainer", translation: [0, 0] }
+
+      m.screen.originSelection = originSelection
+      m.screen.infoContainer = infoContainer
+
+      m.expectCalled(m.screen.styleManager@.loadBundle("pkg:/source/main/view/screens/DetailsScreen.bundle"), bundle)
+      m.expectCalled(m.screen.createViewsFromStyleJson(bundle.views))
+      m.expectCalled(m.screen.updateDetails())
+
+      m.assertEqual(m.screen.listTranslation, [0, 0])
+      m.assertEqual(m.screen.infoContainerTranslation, [0, 0])
+
+      m.screen.createViews()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("updateDetails")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("sets the details for the screen")
+    function _()
+      titleLabel = { "id": "title" }
+      backgroundPoster = { "id": "backgroundPoster" }
+      descriptionLabel = { "id": "descriptionLabel" }
+
+      json = { "title": "title", "posterUrl": "url", "description": "description" }
+      currentItem = { "id": "currentItem", json: json }
+      originSelection = { "id": "originSelection", currentItem: currentItem }
+
+      m.screen.originSelection = originSelection
+      m.screen.titleLabel = titleLabel
+      m.screen.descriptionLabel = descriptionLabel
+      m.screen.backgroundPoster = backgroundPoster
+
+      m.screen.updateDetails()
+
+      m.assertEqual(m.screen.titleLabel.text, "title")
+      m.assertEqual(m.screen.descriptionLabel.text, "description")
+      m.assertEqual(m.screen.backgroundPoster.uri, "url")
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onPlaySelected")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it gets triggered when the play button is selected")
+    function _()
+      originSelection = { "id": "originSelection", currentItem: { "id": "currentItem" } }
+      selection = { "id": "selection" }
+
+      m.screen.originSelection = originSelection
+
+      m.expectCalled(m.screen.createSelection(m.screen.originSelection.currentItem, "play"), selection)
+      m.expectCalled(m.screen.executeSelection(selection))
+
+      m.screen.onPlaySelected()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("addToFavorites")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("changes favorite button when item is added to favorites")
+    function _()
+      favoriteButton = { "id": "favoriteButton" }
+      m.screen.favoriteButton = favoriteButton
+
+      m.screen.addToFavorites()
+
+      m.assertEqual(m.screen.favoriteButton.iconStyle.uri, "pkg:/images/fav-icon-filled.png")
+      m.assertTrue(m.screen.isFavorite)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("removeFromFavorites")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("changes favorite button when item is removed from favorites")
+    function _()
+      favoriteButton = { "id": "favoriteButton" }
+      m.screen.favoriteButton = favoriteButton
+
+      m.screen.removeFromFavorites()
+
+      m.assertEqual(m.screen.favoriteButton.iconStyle.uri, "pkg:/images/fav-icon.png")
+      m.assertFalse(m.screen.isFavorite)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("setListContent")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("sets the list content and calls the callback when the list is rendered")
+    function _()
+      listSettings = { "id": "listSettings" }
+      content = { "id": "content" }
+      relatedRow = { "id": "relatedRow" }
+
+      m.expectCalled(m.screen.list@.setContent(invalid))
+      m.expectCalled(m.screen.createListSettings(), listSettings)
+      m.expectCalled(m.screen.createListContent(listSettings), content)
+
+      m.expectCalled(m.screen.setFocus(m.screen.loadingIndicator))
+
+      m.expectCalled(content@.setNotificationsEnabled(false))
+      m.expectCalled(m.screen.makeRelatedRow(), relatedRow)
+
+      m.expectCalled(content@.appendChild(relatedRow))
+      m.expectCalled(m.screen.list@.setContent(content))
+
+      m.expectCalled(m.screen.onListRenderState("rendered"))
+      m.expectNotCalled(m.screen.observe)
+
+      m.screen.setListContent()
+
+      m.assertFalse(m.screen.loadingIndicator.isActive)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("makeRelatedRow")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("created the related row")
+    function _()
+      row = { "id": "row" }
+      rowSettings = { "id": "rowSettings" }
+      items = [{ "id": "item" }]
+
+      m.screen.rowSettings = rowSettings
+      m.expectCalled(m.screen.createSGNode("ml_RowContent"), row)
+      m.expectCalled(m.screen.makeItems(20), items)
+
+      m.expectCalled(row@.appendChildren(items))
+
+      m.screen.makeRelatedRow()
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("makeItems")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("creates the items")
+    function _()
+      item = { "id": "item" }
+      size = [300, 200]
+      m.expectCalled(m.screen.makeItem("Item 0", size), item)
+
+      m.assertEqual(m.screen.makeItems(1, size), [item])
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("makeItem")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("creates the item")
+    function _()
+      item = { "id": "item" }
+      title = "Item 1"
+      size = [400, 300]
+      m.expectCalled(m.screen.createSGNode("Item", invalid, invalid, {
+        json: {
+          title: title
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam lorem id ante feugiat fermentum. Proin mi erat, pretium at ante at, condimentum porta lacus. Proin hendrerit tincidunt risus blandit gravida. Duis imperdiet, nulla ut maximus viverra, magna nulla tristique diam, eget rhoncus eros sem quis magna. Quisque viverra ultricies sem ac dictum. Cras sit amet lectus eros. Duis lobortis ligula ac sapien pharetra imperdiet. Vestibulum dictum urna quis orci fermentum ultricies ac in orci."
+          posterUrl: "https://picsum.photos" + `/${size[0]}/${size[1]}`
+
+        }
+      }), item)
+      m.assertEqual(m.screen.makeItem(title, size), item)
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("showRow")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it moves the list and row up")
+    function _()
+      mainGroup = { "id": "mainGroup", "translation": [0, 0] }
+      m.screen.mainGroup = mainGroup
+
+      m.expectCalled(m.screen.mainGroupAnimation.animateTo([m.screen.mainGroup.translation[0], m.screen.mainGroup.translation[1] - 800], 0.2))
+      m.expectCalled(m.screen.listAnimation.animateTo([m.screen.list.translation[0], m.screen.list.translation[1] - 700], 0.2))
+
+      m.screen.showRow(true)
+
+      m.assertTrue(m.screen.rowVisibleOnScreen)
+
+    end function
+
+    @it("it moves the list and row down")
+    function _()
+      mainGroup = { "id": "mainGroup", "translation": [0, 0] }
+      m.screen.mainGroup = mainGroup
+
+      m.expectCalled(m.screen.mainGroupAnimation.animateTo([0, 0], 0.1))
+      m.expectCalled(m.screen.listAnimation.animateTo(m.screen.list.translation, 0.1))
+
+      m.screen.showRow(false)
+
+      m.assertFalse(m.screen.rowVisibleOnScreen)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onButtonsGroupSelectedIndex")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it gets triggered when play is selected")
+    function _()
+      buttonsGroup = { "id": "buttonsGroup" }
+      button = { "id": "button" }
+
+      playButton = { "id": "playButton" }
+      m.screen.buttonsGroup = buttonsGroup
+      m.screen.playButton = playButton
+
+      m.expectCalled(m.screen.buttonsGroup@.getSelectedButton(), button)
+      m.expectCalled(m.screen.playButton.isSameNode(button), true)
+
+      m.expectCalled(m.screen.onPlaySelected())
+      m.expectCalled(m.screen.resetButtonSelectedState(0))
+
+      m.screen.onButtonsGroupSelectedIndex(0)
+
+    end function
+
+    @it("it gets triggered when favorite button is selected")
+    function _()
+      buttonsGroup = { "id": "buttonsGroup" }
+      button = { "id": "button" }
+
+      playButton = { "id": "playButton" }
+      favoriteButton = { "id": "favoriteButton" }
+      m.screen.buttonsGroup = buttonsGroup
+      m.screen.playButton = playButton
+      m.screen.favoriteButton = favoriteButton
+
+      m.screen.isFavorite = false
+
+      m.expectCalled(m.screen.buttonsGroup@.getSelectedButton(), button)
+      m.expectCalled(m.screen.playButton.isSameNode(button), false)
+      m.expectCalled(m.screen.favoriteButton.isSameNode(button), true)
+
+      m.expectCalled(m.screen.addToFavorites())
+      m.expectNotCalled(m.screen.removeFromFavorites)
+
+      m.expectCalled(m.screen.resetButtonSelectedState(0))
+
+      m.screen.onButtonsGroupSelectedIndex(0)
+    end function
+
+    @it("it gets triggered when favorite button is selected and is already a favorite")
+    function _()
+      buttonsGroup = { "id": "buttonsGroup" }
+      button = { "id": "button" }
+
+      playButton = { "id": "playButton" }
+      favoriteButton = { "id": "favoriteButton" }
+      m.screen.buttonsGroup = buttonsGroup
+      m.screen.playButton = playButton
+      m.screen.favoriteButton = favoriteButton
+
+      m.screen.isFavorite = true
+
+      m.expectCalled(m.screen.buttonsGroup@.getSelectedButton(), button)
+      m.expectCalled(m.screen.playButton.isSameNode(button), false)
+      m.expectCalled(m.screen.favoriteButton.isSameNode(button), true)
+
+      m.expectNotCalled(m.screen.addToFavorites)
+      m.expectCalled(m.screen.removeFromFavorites())
+
+      m.expectCalled(m.screen.resetButtonSelectedState(0))
+
+      m.screen.onButtonsGroupSelectedIndex(0)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onListRenderState")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it gets triggered when the list is rendered")
+    @params("rendered", false)
+    @params("loading", true)
+    function _(state, expectedIsActive)
+
+      m.screen.onListRenderState(state)
+      m.assertEqual(m.screen.loadingIndicator.isActive, expectedIsActive)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onItemSelected")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it gets triggered when an item is selected")
+    function _()
+      item = { "id": "item" }
+      event = { "id": "event", rowIndex: 2, cellIndex: 3, }
+      selection = { "id": "selection" }
+
+
+      m.expectCalled(m.screen.list@.getItem(event.rowIndex, event.cellIndex), item)
+      m.expectCalled(m.screen.createSelection(item, "display", {}, "detailsScreen"), selection)
+      m.expectCalled(m.screen.executeSelection(selection))
+
+      m.screen.onItemSelected(event)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressDown")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it returns false if row is already visible")
+    function _()
+      m.screen.rowVisibleOnScreen = true
+      m.expectNotCalled(m.screen.showRow)
+      m.expectNotCalled(m.screen.setFocus)
+      m.expectNotCalled(m.screen.list@.moveToRowItemIndex())
+
+      m.assertFalse(m.screen.onKeyPressDown())
+    end function
+
+    @it("shows row and returns true if row is not visible")
+    function _()
+      m.screen.rowVisibleOnScreen = false
+      m.expectCalled(m.screen.showRow(true))
+      m.expectCalled(m.screen.setFocus(m.screen.list))
+      m.expectCalled(m.screen.list@.moveToRowItemIndex(0, m.screen.focusedCellIndex))
+
+      m.assertTrue(m.screen.onKeyPressDown())
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressUp")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false if buttons group is focused")
+    function _()
+
+      m.expectCalled(m.screen.isControlFocused(m.screen.list), false)
+      m.expectNotCalled(m.screen.showRow)
+      m.expectNotCalled(m.screen.setFocus)
+
+      m.assertFalse(m.screen.onKeyPressUp())
+    end function
+
+    @it("hides row and focuses buttons group if list is focused")
+    function _()
+      buttonsGroup = { "id": "buttonsGroup" }
+      m.screen.buttonsGroup = buttonsGroup
+
+      m.expectCalled(m.screen.isControlFocused(m.screen.list), true)
+      m.expectCalled(m.screen.showRow(false))
+      m.expectCalled(m.screen.setFocus(m.screen.buttonsGroup))
+
+      m.assertTrue(m.screen.onKeyPressUp())
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onShow")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("gets triggered when the screen is shown, hides menu and focuses buttons group")
+    function _()
+      buttonsGroup = { "id": "buttonsGroup" }
+
+      m.screen.buttonsGroup = buttonsGroup
+
+      m.expectCalled(m.screen.appController@.setMenuVisible(false))
+      m.expectCalled(m.screen.setFocus(m.screen.buttonsGroup))
+
+      m.screen.onShow()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onGainedFocus")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("gets triggered when the screen gains focus and focuses buttons group")
+    function _()
+      m.screen.rowVisibleOnScreen = false
+      buttonsGroup = { "id": "buttonsGroup" }
+
+      m.screen.buttonsGroup = buttonsGroup
+
+      m.expectCalled(m.screen.setFocus(m.screen.buttonsGroup))
+      m.screen.onGainedFocus(true)
+    end function
+
+    @it("gets triggered when the screen gains focus and focuses the list")
+    function _()
+      m.screen.rowVisibleOnScreen = true
+      m.expectCalled(m.screen.setFocus(m.screen.list))
+
+      m.screen.onGainedFocus(true)
+    end function
+
+  end class
+end namespace

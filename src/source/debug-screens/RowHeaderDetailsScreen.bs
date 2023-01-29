@@ -201,7 +201,7 @@ namespace sample.debug.screens
 
     protected override function onShow()
       super.onShow()
-      m.appController@.setTopMenuVisible(false)
+      m.appController@.setMenuVisible(false)
       m.log.info("showing details screen for item", mc.dv(asNode(m.originSelection.initialItem)))
       m.setFocus(m.list)
     end function

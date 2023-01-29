@@ -1,0 +1,340 @@
+import "pkg:/source/tests/BaseTestSuite.spec.bs"
+import "pkg:/source/main/view/screens/SearchScreen.bs"
+
+namespace tests
+  @suite("SearchScreen tests")
+  class SearchScreenTests extends tests.BaseTestSuite
+    private screen as mc.types.node
+
+    protected override function beforeEach()
+      super.beforeEach()
+      m.screen = m.createNodeClass(sample.view.screens.SearchScreen)
+      m.screen.loadingIndicator = { "id": "loadingIndicator", isActive: true }
+      m.screen.list = { "id": "list", state: "rendered", translation: [0, 0] }
+      m.screen.keyboard = mc.createSGNode("mv_MiniKeyboard")
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("initialize")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it initializes the screen")
+    function _()
+      m.expectCalled(m.screen.createViews())
+      m.expectCalled(m.screen.observe(m.screen.keyboard.textEditBox.text, m.screen.onKeyboardTextInputChange))
+
+      m.screen.initialize()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("createViews")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("creates the views")
+    function _()
+      json = { "id": "json" }
+      m.expectCalled(m.screen.styleManager@.loadBundle("pkg:/source/main/view/screens/SearchScreen.bundle"), json)
+      m.expectCalled(m.screen.createViewsFromStyleJson(json.views))
+      m.expectCalled(m.screen.setKeyboardStyle, json.styles)
+
+      m.screen.createViews()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyboardTextInputChange")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it waits for the user to stop typing if entered text has more than 1 character")
+    function _()
+      task = { "id": "task" }
+      m.screen.searchTask = task
+
+      m.expectCalled(m.screen.cancelTask(m.screen.searchTask))
+      m.expectCalled(m.screen.waitToFinishTyping())
+
+      m.screen.onKeyboardTextInputChange("text")
+      m.assertEqual(m.screen.searchText, "text")
+    end function
+
+    @it("hides list if keyboard text is empty")
+    function _()
+      task = { "id": "task" }
+      m.screen.searchTask = task
+      emptyResultslabel = { "id": "emptyResultslabel" }
+
+      m.screen.emptyResultsLabel = emptyResultslabel
+
+      m.expectCalled(m.screen.cancelTask(m.screen.searchTask))
+      m.expectNotCalled(m.screen.waitToFinishTyping)
+
+      m.screen.onKeyboardTextInputChange("")
+
+      m.assertInvalid(m.screen.searchText)
+      m.assertFalse(m.screen.list.visible)
+      m.assertFalse(m.screen.emptyResultsLabel.visible)
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onFinishedTyping")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it searches for the entered text")
+    function _()
+      m.expectCalled(m.screen.cancelTimeout(m.screen.timer))
+      m.expectCalled(m.screen.load())
+
+      m.assertInvalid(m.screen.timer)
+
+      m.screen.onFinishedTyping()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onSearchTaskResponse")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("shows the empty message if the response is not successful")
+    function _()
+      result = { "id": "result", isOk: false }
+      content = { "id": "content" }
+      row = {}
+      emptyResultsLabel = { "id": "emptyResultsLabel" }
+      focusIndicatorManager = { "id": "focusIndicatorManager" }
+
+      m.screen.emptyResultsLabel = emptyResultsLabel
+      m.screen.list.focusIndicatorManager = focusIndicatorManager
+
+      m.expectNotCalled(m.screen.makeListContent)
+      m.expectNotCalled(content@.setNotificationsEnabled())
+      m.expectNotCalled(m.screen.makeItemsRow)
+      m.expectNotCalled(content@.appendRow(row))
+
+      m.expectNotCalled(m.screen.list@.setContent())
+
+      m.screen.onSearchTaskResponse(result)
+
+      m.assertTrue(m.screen.emptyResultsLabel.visible)
+      m.assertFalse(m.screen.list.visible)
+      m.assertTrue(m.screen.list.focusIndicatorManager.isHidden)
+
+    end function
+
+    @it("sets the list content if the response is successful")
+    function _()
+      result = { "id": "result", isOk: true }
+      content = { "id": "content" }
+      row = { "id": "row", length: 1 }
+      emptyResultsLabel = { "id": "emptyResultsLabel" }
+      focusIndicatorManager = { "id": "focusIndicatorManager" }
+
+      m.screen.emptyResultsLabel = emptyResultsLabel
+      m.screen.list.focusIndicatorManager = focusIndicatorManager
+
+      m.expectCalled(m.screen.makeListContent(), content)
+      m.expectCalled(content@.setNotificationsEnabled(false))
+      m.expectCalled(m.screen.makeItemsRow(result.data), row)
+      m.expectCalled(content@.appendChild(row))
+
+      m.expectCalled(m.screen.list@.setContent(content))
+
+      m.screen.onSearchTaskResponse(result)
+
+      m.assertFalse(m.screen.emptyResultsLabel.visible)
+      m.assertTrue(m.screen.list.visible)
+      m.assertFalse(m.screen.list.focusIndicatorManager.isHidden)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("load")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it creates a task to search for the entered text")
+    function _()
+      task = { "id": "task" }
+      emptyResultsLabel = { "id": "emptyResultsLabel" }
+      focusIndicatorManager = { "id": "focusIndicatorManager" }
+
+      m.screen.searchTask = task
+      m.screen.emptyResultsLabel = emptyResultsLabel
+      m.screen.list.focusIndicatorManager = focusIndicatorManager
+
+      m.expectCalled(m.screen.list@.setContent(invalid))
+      m.expectCalled(m.screen.cancelTask(m.screen.searchTask))
+      m.expectCalled(m.screen.setFocus(m.screen.keyboard))
+
+      args = {
+        args: {
+          "searchText": m.screen.searchText
+        }
+      }
+      m.expectCalled(m.screen.createTask("SearchTask", args, m.screen.onSearchTaskResponse), task)
+
+      m.screen.load()
+
+      m.assertTrue(m.screen.loadingIndicator.isActive)
+      m.assertTrue(m.screen.list.focusIndicatorManager.isHidden)
+      m.assertFalse(m.screen.list.visible)
+      m.assertFalse(m.screen.emptyResultsLabel.visible)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("waitToFinishTyping")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it creates a timer to wait for the user to stop typing")
+    function _()
+      timer = { "id": "timer" }
+      m.screen.timer = timer
+
+      m.expectCalled(m.screen.cancelTimeout(m.screen.timer))
+      m.expectCalled(m.screen.setTimeout(m.screen.onFinishedTyping, 2))
+
+      m.screen.waitToFinishTyping()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("makeItemsRow")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it creates a row with the items")
+    function _()
+      row = { "id": "row" }
+      settings = { "id": "settings" }
+      item = { "id": "item" }
+      json = { "id": "json" }
+
+      m.expectCalled(m.screen.createSGNode("ml_RowContent"), row)
+      m.expectCalled(m.screen.getRowSettings(), settings)
+
+      m.expectCalled(m.screen.createSGNode("Item", invalid, invalid, { json: json }), item)
+      m.expectCalled(row@.appendChildren([item]))
+
+      m.assertEqual(m.screen.makeItemsRow([json]), row)
+      m.assertEqual(row.settings, settings)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onItemSelected")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it gets triggered when an item is selected")
+    function _()
+      item = { "id": "item" }
+      event = { "id": "event", rowIndex: 2, cellIndex: 3, }
+      selection = { "id": "selection" }
+
+      m.expectCalled(m.screen.list@.getItem(event.rowIndex, event.cellIndex), item)
+      m.expectCalled(m.screen.createSelection(item, "display", {}, "detailsScreen"), selection)
+      m.expectCalled(m.screen.executeSelection(selection))
+
+      m.screen.onItemSelected(event)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onGainedFocus")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("gets triggered when the screen gains focus")
+    function _()
+      m.expectCalled(m.screen.setFocus(m.screen.keyboard))
+      m.screen.onGainedFocus(true)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onShow")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("gets triggered when the screen is shown")
+    function _()
+      m.expectCalled(m.screen.appController@.setMenuVisible(true))
+
+      m.screen.onShow()
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressBack")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false when back key is pressed")
+    function _()
+      m.assertFalse(m.screen.onKeyPressBack())
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressRight")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("doesn't focus list if already focused or list has no content")
+    function _()
+      content = { "id": "content", length: 0 }
+      m.screen.list.content = content
+      m.expectNotCalled(m.screen.isControlFocused)
+
+      m.expectNotCalled(m.screen.setFocus)
+
+      m.assertTrue(m.screen.onKeyPressRight())
+    end function
+
+    @it("it focuses list")
+    function _()
+      content = { "id": "content", length: 1 }
+      m.screen.list.content = content
+      m.screen.loadingIndicator.isActive = false
+
+      m.expectCalled(m.screen.isControlFocused(m.screen.list), false)
+      m.expectCalled(m.screen.setFocus(m.screen.list))
+
+      m.assertTrue(m.screen.onKeyPressRight())
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressLeft")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false if list is not focused")
+    function _()
+      m.screen.list.isChildFocused = false
+      m.expectNotCalled(m.screen.setFocus)
+
+      m.assertFalse(m.screen.onKeyPressLeft())
+    end function
+
+    @it("sets focus to keyboard if list is focused and returns true")
+    function _()
+      m.screen.list.isChildFocused = true
+      m.expectCalled(m.screen.setFocus(m.screen.keyboard))
+
+      m.assertTrue(m.screen.onKeyPressLeft())
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressUp")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns true when up key is pressed and app uses side menu, false otherwise")
+    @params(true, true)
+    @params(false, false)
+    function _(useSideMenu, expected)
+      appController = { "id": "appController", "useSideMenu": useSideMenu }
+      m.screen.appController = appController
+
+      m.assertEqual(m.screen.onKeyPressUp(), expected)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressDown")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns true when down key is pressed and app uses side menu, false otherwise")
+    @params(true, true)
+    @params(false, false)
+    function _(useSideMenu, expected)
+      appController = { "id": "appController", "useSideMenu": useSideMenu }
+      m.screen.appController = appController
+
+      m.assertEqual(m.screen.onKeyPressDown(), expected)
+    end function
+
+  end class
+end namespace

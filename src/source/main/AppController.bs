@@ -117,7 +117,7 @@ namespace mc.sample
 
     end function
 
-    function setTopMenuVisible(visible as boolean)
+    function setMenuVisible(visible as boolean)
       m.log.info("setting top menu visible", visible)
 
       if m.navMenu <> invalid
