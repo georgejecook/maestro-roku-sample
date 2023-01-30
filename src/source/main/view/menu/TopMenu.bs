@@ -2,7 +2,7 @@ import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
 import "pkg:/source/roku_modules/maestro/core/Utils.brs"
 import "pkg:/source/roku_modules/maestro/view/Animation.brs"
 
-namespace sample.view
+namespace sample.view.menu
   @node("TopMenu", "mv_BaseView")
   class TopMenu extends mv.BaseView
 

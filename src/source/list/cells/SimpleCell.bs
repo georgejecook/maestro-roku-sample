@@ -1,5 +1,6 @@
 import "pkg:/source/roku_modules/maestro/ml/cells/BaseCell.brs"
-namespace sample
+
+namespace sample.list.cells
   @node("SimpleCell", "ml_BaseCell")
   class SimpleCell extends ml.BaseCell
 
@@ -23,7 +24,7 @@ namespace sample
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     protected override function createViews() as void
-      bundle = m.global.styleManager@.loadBundle("pkg:/source/cells/SimpleCell.bundle")
+      bundle = m.global.styleManager@.loadBundle("pkg:/source/list/cells/SimpleCell.bundle")
       m.styles = bundle.styles
       m.createViewsFromStyleJson(bundle.views)
     end function
@@ -33,6 +34,10 @@ namespace sample
       m.poster.uri = mc.getString(content, "json.posterUrl")
       m.label.visible = true
       m.setScale(1, false)
+    end function
+
+    protected override function onShowWithContent(content as mc.types.node)
+      m.toggleHighlighted(false)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -57,17 +62,16 @@ namespace sample
       m.poster.scale = [m.scale, m.scale]
     end function
 
-
-    protected override function onShowWithContent(content as mc.types.node)
-      m.toggleHighlighted(false)
-    end function
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Lifecycle Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     protected override function onHide()
       m.toggleHighlighted(true)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    '++ Delegate Methods
+    '++ Cell Delegate Methods
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private function onScrollingChange(isScrolling as boolean, isLong as boolean)

@@ -1,7 +1,7 @@
 import "pkg:/source/roku_modules/maestro/view/BaseView.brs"
 import "pkg:/source/roku_modules/maestro/view/Animation.brs"
 
-namespace sample.main.view
+namespace sample.view.menu
   @node("SideMenu", "mv_BaseView")
   class SideMenu extends mv.BaseView
 
@@ -133,7 +133,6 @@ namespace sample.main.view
         m.bgRect.size = [m.buttonsGroup.translation[0] * 2 + size[0], m.bgRect.size[1]]
       end if
     end function
-
 
     private function expandMenu(expand as boolean, animate = true as boolean)
       if expand = true

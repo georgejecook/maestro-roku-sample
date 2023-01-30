@@ -1,0 +1,61 @@
+import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
+import "pkg:/source/roku_modules/maestro/ml/BaseRow.brs"
+import "pkg:/source/roku_modules/maestro/ml/RowItemScroller.brs"
+import "pkg:/source/roku_modules/maestro/ml/RowItemViewManager.brs"
+
+namespace sample.list.rows
+  @node("VideoRow", "ml_BaseRow")
+  class VideoRow extends ml.BaseRow
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Views
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private video
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function new()
+      super()
+    end function
+
+    protected override function createViews()
+
+      bundle = m.styleManager@.loadBundle("pkg:/source/list/rows/VideoRow.bundle")
+      m.createViewsFromStyleJson(bundle.views)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Overridden Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function onContentUpdate(content as mc.types.node)
+      'do stuff with content here
+      m.video.content = m.createSGNode("ContentNode", invalid, "content", {
+        streamFormat: "hls"
+        url: "https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
+      })
+      m.video.control = "play"
+    end function
+
+    public override function getFocusIndicatorConfig(cellInfo as ml.CellInfo, direction as integer, isFloatingFocus as boolean, isFromListScroll = false as boolean) as ml.FocusIndicatorConfig
+      return ml.createFocusIndicatorConfig(m.top, invalid, direction)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Row Delegate Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onDidLoseFocus(event as ml.ListEvent)
+      m.video.control = "stop"
+    end function
+
+    private function onDidGainFocus(event as ml.ListEvent)
+      if m.video.state <> "stooped"
+        m.video.control = "play"
+      end if
+    end function
+  end class
+end namespace

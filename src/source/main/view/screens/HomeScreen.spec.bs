@@ -1,5 +1,5 @@
 import "pkg:/source/tests/BaseTestSuite.spec.bs"
-import "pkg:/source/debug-screens/HomeScreen.bs"
+import "pkg:/source/main/view/screens/HomeScreen.bs"
 
 namespace tests
   @suite("HomeScreen tests")
@@ -8,7 +8,7 @@ namespace tests
 
     protected override function beforeEach()
       super.beforeEach()
-      m.screen = m.createNodeClass(HomeScreen)
+      m.screen = m.createNodeClass(sample.view.screens.HomeScreen)
       m.screen.loadingIndicator = { "id": "loadingIndicator" }
       m.screen.list = { "id": "list", state: "rendered" }
     end function
@@ -117,27 +117,27 @@ namespace tests
 
     @it("it gets triggered when the screen is shown")
     function _()
-      m.expectCalled(m.screen.appController@.setTopMenuVisible(true))
+      m.expectCalled(m.screen.appController@.setMenuVisible(true))
 
       m.screen.onShow()
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    @describe("onRowDidGainFocus")
+    @describe("onGainedFocus")
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    @it("it gets triggered when a row gains focus")
-    @params({ "id": "rendered", "focusedCellIndex": 2 }, 4, 2)
-    @params(invalid, -1, -1)
-    function _(row, expectedRowIndex, expectedCellIndex)
-      event = { rowIndex: expectedRowIndex }
-      m.expectCalled(m.screen.list@.getRowRenderer(event.rowIndex), row)
-      m.expectCalled(m.screen.setInstance("focusedIndex", {
-        row: expectedRowIndex
-        cell: expectedCellIndex
-      }))
+    @it("doesn't do anything if it's not self focused")
+    function _()
+      m.expectNotCalled(m.screen.setFocus)
 
-      m.screen.onRowDidGainFocus(event)
+      m.screen.onGainedFocus(false)
+    end function
+
+    @it("sets focus on the list")
+    function _()
+      m.expectCalled(m.screen.setFocus(m.screen.list))
+
+      m.screen.onGainedFocus(true)
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -145,22 +145,58 @@ namespace tests
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     @it("it gets triggered when an item is selected")
-    @params(0, 1)
-    @params(2, 2)
-    function _(rowIndex, cellIndex)
+    @params(0, 1, "DetailsScreen")
+    @params(2, 2, "DetailsScreen")
+    @params(1, 3, "RowHeaderDetailsScreen")
+
+    function _(rowIndex, cellIndex, screen)
       item = { "id": "item" }
       event = { "rowIndex": rowIndex, "cellIndex": cellIndex }
       selection = { "id": "selection" }
 
       m.expectCalled(m.screen.list@.getItem(event.rowIndex, event.cellIndex), item)
-      m.expectCalled(m.screen.createSelection(item, "display", "detailsScreen"), selection)
+      m.expectCalled(m.screen.createSelection(item, "display", {}, screen), selection)
       m.expectCalled(m.screen.executeSelection(selection))
 
       m.screen.onItemSelected(event)
-
     end function
 
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressBack")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+    @it("returns false when back key is pressed")
+    function _()
+      m.assertFalse(m.screen.onKeyPressBack())
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressLeft")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false when left key is pressed and app uses side menu, true otherwise")
+    @params(true, false)
+    @params(false, true)
+    function _(useSideMenu, expected)
+      appController = { "id": "appController", "useSideMenu": useSideMenu }
+      m.screen.appController = appController
+
+      m.assertEqual(m.screen.onKeyPressLeft(), expected)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressRight")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false when right key is pressed and app uses side menu, true otherwise")
+    @params(true, false)
+    @params(false, true)
+    function _(useSideMenu, expected)
+      appController = { "id": "appController", "useSideMenu": useSideMenu }
+      m.screen.appController = appController
+
+      m.assertEqual(m.screen.onKeyPressRight(), expected)
+    end function
 
   end class
 end namespace
