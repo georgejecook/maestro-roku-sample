@@ -1,0 +1,24 @@
+
+namespace sample
+  enum GeneralState
+    cancel = "cancel"
+    error = "error"
+    finished = "finished"
+    failed = "failed"
+    loading = "loading"
+    none = "none"
+    pending = "pending"
+    ready = "ready"
+    running = "running"
+    stopped = "stopped"
+    success = "success"
+  end enum
+end namespace
+
+namespace sample.list
+  enum ViewState
+    rendered = "rendered"
+    loading = "loading"
+  end enum
+
+end namespace

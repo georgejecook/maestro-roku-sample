@@ -31,6 +31,5 @@
   "rokuLog": {
     "strip": true
   },
-  "NOTE:roku-deploy is currently broken and causes a crash when createPackage is true": true,
   "_createPackage": true
 }

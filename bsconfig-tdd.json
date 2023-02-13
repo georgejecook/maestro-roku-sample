@@ -6,6 +6,8 @@
     "meta/**/*.*",
     "components/**/*.*",
     "!**/images/**/*.*",
+    { "src": "../src-dev/source/**/*.*", "dest": "source" },
+    "!**/*.spec.bs",
     "**/BaseTest*.spec.bs",
     "**/START",
     "**/END"

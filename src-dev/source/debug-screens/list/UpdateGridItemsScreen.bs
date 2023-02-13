@@ -3,14 +3,21 @@ import "pkg:/source/roku_modules/maestro/core/Utils.brs"
 import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
 import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 
-@node("BaseListScreen", "mv_BaseScreen")
-class BaseListScreen extends mv.BaseScreen
+@node("UpdateGridItemsScreen", "mv_BaseScreen")
+class UpdateGridItemsScreen extends mv.BaseScreen
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Views
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private list as mc.types.node
+  private menu as mc.types.node
+
+  'buttons
+  private listUpdateActiveButton as mc.types.node
+  private applyChangeButton as mc.types.node
+  private moveItemUpButton as mc.types.node
+  private moveItemDownButton as mc.types.node
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Private Fields
@@ -26,6 +33,8 @@ class BaseListScreen extends mv.BaseScreen
   private numberOfRows = 20
   private defaultCellType = "ml_SimpleCell"
 
+  private isListActive = true
+  private isRowSelectionMode = false
   private firstItem = invalid
   private dataIndex = 0
   private selectedRow as mc.types.node
@@ -34,36 +43,76 @@ class BaseListScreen extends mv.BaseScreen
   private selectedItem as mc.types.node
 
   private rows = []
-  private label as mc.types.node
-  private updateInfoTimeout as mc.types.node
-
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Initialization
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   function new()
-    super("BaseListScreen")
+    super("UpdateGridItemsScreen")
   end function
 
   protected override function initialize()
     super.initialize()
-    bundle = m.styleManager@.loadBundle("pkg:/source/debug-screens/list/BaseListScreen.json")
+    bundle = m.styleManager@.loadBundle("pkg:/source/debug-screens/list/UpdateGridItemsScreen.json")
     m.createViewsFromStyleJson(bundle.views)
     m.resetData()
-    m.label = m.createSGNode("mv_Label", m.top, "label", {
-      translation: [500, 0]
-      size: [1000, 50]
-      fontKey: "mediumbold,30"
-      color: "#ffffff"
-    })
+
+    m.list.delegate = m.top
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Callbacks
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+  private function onMenuItemChange(index as integer)
+    m.log.info("selected tab item", index)
+    button = m.menu@.getSelectedButton()
+    if button.isSameNode(m.listUpdateActiveButton)
+      m.log.info("resetting")
+      m.isListActive = not m.isListActive
+      m.listUpdateActiveButton.text = `List updates: ${m.isListActive ? "On": "Off"}`
+      m.list@.setUpdatesEnabled(m.isListActive)
+    else if button.isSameNode(m.applyChangeButton)
+      m.log.info("applying changes")
+      m.reload()
+    else if button.isSameNode(m.moveItemUpButton)
+      m.log.info("moving an item up")
+      m.moveItem(-1)
+    else if button.isSameNode(m.moveItemDownButton)
+      m.log.info("moving an item down")
+      m.moveItem(1)
+    end if
+    button.isSelected = false
+  end function
 
+  private function moveItem(direction as integer)
+    if m.selectedItem <> invalid
+      nextIndex = m.selectedRowIndex + direction
+      nextRow = m.rows[nextIndex]
+      if nextRow <> invalid
+        m.selectedRowIndex = nextIndex
+        m.log.info("moving item", mc.dv(m.selectedItem), "to row", nextIndex)
+
+        if m.isRowSelectionMode
+          m.log.warn("moving entire row")
+          children = []
+          for i = m.selectedItemIndex to m.selectedItemIndex + 3
+            children.push(m.selectedRow@.getChild(i))
+            m.selectedRow@.removeChildIndex(i)
+          end for
+          nextRow@.appendChildren(children)
+        else
+          nextRow@.appendChild(m.selectedItem)
+        end if
+
+      else
+        m.log.error("no next row at index", nextIndex)
+      end if
+    else
+      m.log.error("no item selected")
+    end if
+  end function
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ List Data - Initialization
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -75,7 +124,7 @@ class BaseListScreen extends mv.BaseScreen
   end function
 
   private function makeListData()
-    m.list.content = invalid
+    m.list@.setContent(invalid)
 
     timer = new mc.utils.DebugTimer("list")
 
@@ -86,85 +135,26 @@ class BaseListScreen extends mv.BaseScreen
     listSettings.rowCreationStrategy = "async"
     listSettings.rowCreationBatchSize = 5
     listSettings.rowCreationBatchDelay = 0.3
+    listSettings.numberItemsToRenderAfter = 5
+    listSettings.numberItemsToRenderBefore = 5
     listSettings.renderStrategy = "dynamic"
-    listSettings.numberItemsToRenderAfter = 2
-    listSettings.numberItemsToRenderBefore = 1
-
 
     content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
-    content@.appendChild(m.createHeaderOnlyData())
-    m.liveRow = m.createRow("live", 20)
-    m.upcomingRow = m.createRow("upcoming", 20)
-    content@.appendChild(m.liveRow)
-    m.removeNonHeaderRows(true)
-    m.isLoading = not m.isLoading
-
-    m.rows = [
-      m.liveRow
-      m.upcomingRow
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-      m.createRow("complete", 20)
-      m.addRow()
-    ]
-
-    m.list.content@.appendChildren(m.rows, 1)
-
-    content@.appendChild(m.upcomingRow)
+    content@.setNotificationsEnabled(false)
     timer.log("makeData")
+
     m.setFocus(m.loadingIndicator)
 
-    m.list.content = content
+    m.list@.setContent(content)
 
     timer.log("set content")
-    if m.list.state = "rendered"
+    if m.list.state = sample.list.ViewState.rendered
       m.onListRenderState("rendered")
       m.loadingIndicator.isActive = false
     else
       m.observeNodeField(m.list, "state", m.onListRenderState, "value", true)
     end if
   end function
-
-
-  private function addRow()
-    rowFocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
-    row = createObject("roSGNode", "ml_RowContent")
-    rowFocusSettings.feedbackColor = "#F4D42A"
-    headerSettings = ml.listMixin.createHeaderSettings([30, 20], 80, "mediumBold,50", "#ffff00")
-    cellSettings = ml.listMixin.createCellSettings("PosterCellEfficient", [400, 250], 100)
-    row.settings = ml.listMixin.createRowSettings(cellSettings, rowFocusSettings, 30, headerSettings)
-    row.settings.contentOffset = [100, 0]
-
-    row.title = "NEW ROW " + m.contentId.toStr()
-    row.id = rnd(2147483647).toStr()
-    m.contentId++
-    row@.appendChildren(m.makeItems(m.defaultCellType, 20))
-    return row
-  end function
-
-
-  private liveRow as mc.types.node
-  private upcomingRow as mc.types.node
 
   private function onListRenderState(state as string)
     m.log.info("onListRenderState", state)
@@ -174,14 +164,6 @@ class BaseListScreen extends mv.BaseScreen
       m.loadingIndicator.isActive = false
     end if
   end function
-
-  private function createHeaderOnlyData()
-    row = createObject("roSGNode", "ml_RowContent")
-    row.id = rnd(2147483647).toStr()
-    row.settings = ml.listMixin.createCustomRowSettings("ComplexRowEfficient", 300)
-    return row
-  end function
-
 
   private function createRow(title as string, numItems as integer)
     numCols = 4
@@ -195,6 +177,7 @@ class BaseListScreen extends mv.BaseScreen
     row.otherRowScreenPos = 70
 
     row.settings.contentOffset = [100, 30]
+    numItems = rnd(5) + 6
     row.title = title
     row@.appendChildren(m.makeItems(m.defaultCellType, numItems, ""))
     return row
@@ -216,13 +199,11 @@ class BaseListScreen extends mv.BaseScreen
   private function makeItem(cellType as string, title as string) as mc.types.node
     id = str(m.contentId).trim()
     child = m.createSGNode("Item", invalid, id, {
-      title: title
       json: {
         title: title
         description: "some really long " + id + "text in here " + id
         posterUrl: "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340"
       }
-      HDGRIDPOSTERURL: "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/340/340"
     })
     m.contentId++
     return child
@@ -232,35 +213,55 @@ class BaseListScreen extends mv.BaseScreen
   '++ Private Methods
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  private function reload() as void
-    ' m.removeNonHeaderRows(false)
-    ' m.rows = [
-    '   m.createRow("live", 20)
-    '   m.createRow("upcoming", 20)
-    '   m.createRow("complete", 20)
-    ' ]
+  private function reload()
+    m.removeNonHeaderRows(false)
+    m.rows = [
+      m.createRow("live", 5)
+      m.createRow("upcoming", 5)
+      m.createRow("complete", 5)
+    ]
 
-
-    ' m.list.content@.insertChildren(m.rows, 1)
+    m.list.content@.insertChildren(m.rows, 0)
     m.list.content@.notifyUpdate()
+    m.list@.synchronizeContent()
   end function
 
-
   private function removeNonHeaderRows(update = true as boolean)
-    ? " AAA"
     header = m.list.content@.getChild(0)
-    ? " BBB"
     m.list.content@.setNotificationsEnabled(false)
-    ? " CCC"
     m.list.content@.clear()
-    ? " DDD"
     m.list.content@.appendChild(header)
-    ? " EE"
 
     if update
-      ? " FFF"
       m.list.content@.notifyUpdate()
+      m.list@.synchronizeContent()
     end if
+  end function
+
+  private function setRowOpacity(rowIndex as integer, fraction as float, direction as integer)
+    'FIXME - need to have separate callback for subrows too
+
+    ' row = m.list@.getRowRenderer(rowIndex)
+    ' if rowIndex = 0
+    '   row.opacity = 1
+    ' else if row.subType() <> "ml_GridRow"
+    '   row.opacity = opacity
+    ' else
+    '   if applyToAll
+    '     startIndex = 0
+    '     endIndex = row.content.length - 1
+    '   else
+    '     'TODO(gcook): maestro-list will have delegate callbacks for subRowIndex changes in future, so this kind of calculation won't be required
+    '     startIndex = mc.clamp((m.list.focusedSubRowIndex - (direction = -1 ? 1 : 0)) * 4, 0, row.content.length - 1)
+    '     endIndex = mc.clamp(startIndex + 3, 0, row.content.length - 1)
+    '   end if
+    '   for i = startIndex to endIndex
+    '     cell = m.list@.getCellRenderer(event.rowIndex, i)
+    '     if cell <> invalid
+    '       cell.opacity = opacity
+    '     end if
+    '   end for
+    ' end if
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -270,7 +271,7 @@ class BaseListScreen extends mv.BaseScreen
   private function onItemSelected(event as ml.ListEvent)
     m.selectedRowIndex = event.rowIndex
     m.selectedRow = m.rows[event.rowIndex]
-    m.selectedItem = m.selectedRow.getChild(event.cellIndex)
+    m.selectedItem = m.selectedRow@.getChild(event.cellIndex)
     m.selectedItemIndex = event.cellIndex
     m.log.info("selected item ", mc.dv(m.selectedItem), "from row", mc.dv(m.selectedRow))
 
@@ -278,11 +279,13 @@ class BaseListScreen extends mv.BaseScreen
 
   private function onRowDidGainFocus(event as ml.ListEvent)
     if event.direction = -1
+      m.setRowOpacity(event.rowIndex, 1, event.direction)
     end if
   end function
 
   private function onRowDidLoseFocus(event as ml.ListEvent)
     if event.direction = 1
+      m.setRowOpacity(event.rowIndex, 0, event.direction)
     end if
   end function
 
@@ -291,25 +294,48 @@ class BaseListScreen extends mv.BaseScreen
 
   private function onRowGainingFocus(event as ml.ListEvent)
     if event.direction = -1
+      m.setRowOpacity(event.rowIndex, event.fraction, event.direction)
     end if
   end function
 
   private function onRowLosingFocus(event as ml.ListEvent)
     if event.direction = 1
+      m.setRowOpacity(event.rowIndex, 1 - event.fraction, event.direction)
     end if
   end function
 
-  private function onRowData(event as ml.ListEvent)
-    if event.data.action = "add"
-      ? " add row"
-      m.liveRow@.appendChildren(m.makeItems(m.defaultCellType, 1, ""))
-    else
-      ? " remove row"
-      m.liveRow@.removeChildIndex(0)
-    end if
-
+  private function toggleListUpdates(enabled as boolean)
+    m.log.info("Setting list updates to ", enabled)
+    m.list@.setUpdatesEnabled(enabled)
   end function
 
+  private function changeContent()
+    row = m.list@.getRow(1)
+    child = m.makeItem(m.defaultCellType, "New item")
+    row@.insertChild(child, 0)
+
+    child = m.makeItem(m.defaultCellType, "Second New item")
+    row@.insertChild(child, 1)
+
+    row = m.list@.getRow(3)
+    row@.removeChildrenIndex(row.length - 1, 0)
+  end function
+
+  private function onKeyPressFastForward() as boolean
+    m.moveItem(1)
+    return true
+  end function
+
+  private function onKeyPressRewind() as boolean
+    m.moveItem(-1)
+    return true
+  end function
+
+  private function onKeyPressPlay() as boolean
+    m.isRowSelectionMode = not m.isRowSelectionMode
+    m.log.info("row selection mode is now: ", m.isRowSelectionMode)
+    return true
+  end function
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Key Presses
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -318,15 +344,25 @@ class BaseListScreen extends mv.BaseScreen
     return key <> "back"
   end function
 
-  private isRemoved = false
-  private isLoading = false
-  private isAtEnd = false
-
-  private function onKeyPressPlay() as boolean
-    isAtEnd = not isAtEnd
-    m.list@.moveToRow(isAtEnd ? 0 : m.list.content.count() - 1, true, 3)
+  protected override function onKeyPressBack() as boolean
+    if m.isControlFocused(m.menu)
+      super.onKeyPressBack()
+    else
+      m.setFocus(m.menu)
+    end if
     return true
   end function
+
+  private function onKeyPressUp() as boolean
+    m.setFocus(m.menu)
+    return true
+  end function
+
+  private function onKeyPressDown() as boolean
+    m.setFocus(m.list)
+    return true
+  end function
+
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Lifecycle
@@ -336,16 +372,10 @@ class BaseListScreen extends mv.BaseScreen
     super.onShow()
     m.list.isHidden = false
     m.setFocus(m.list)
-    m.updateInfoTimeout = m.setInterval(function()
-      pool = m.global.componentPool
-      m.label.text = `cells created: ${pool.numberOfComponents} in use: ${pool.numberOfComponentsInUse}`
-    end function, 1)
   end function
 
   protected override function onHide()
     super.onHide()
-    m.list.isHidden = true
-    m.cancelInterval(m.updateInfoTimeout)
     m.list.isHidden = true
   end function
 

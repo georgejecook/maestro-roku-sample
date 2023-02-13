@@ -9,6 +9,11 @@
     "fonts/**/*.*",
     "components/**/*.*",
     "meta/**/*.*",
+    { "src": "../src-dev/meta/**/*.*", "dest": "meta" },
+    { "src": "../src-dev/source/**/*.*", "dest": "source" },
+    { "src": "../src-dev/images/**/*.*", "dest": "images" },
+    { "src": "../src-dev/components/**/*.*", "dest": "components" },
+    "!../src-dev/source/**/*.spec.bs",
     "!**/*.spec.bs"
   ],
   "plugins": ["maestro-roku-bsc-plugin", "roku-log-bsc-plugin"],

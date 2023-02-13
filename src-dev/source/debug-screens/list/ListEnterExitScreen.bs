@@ -128,7 +128,7 @@ class ListEnterExitScreen extends mv.BaseScreen
 
     m.list@.setContent(m.listContent)
     ' timer.log("set content")
-    if m.list.state = "rendered"
+    if m.list.state = sample.list.ViewState.rendered
       m.onListRenderState("rendered")
       m.loadingIndicator.isActive = false
     else

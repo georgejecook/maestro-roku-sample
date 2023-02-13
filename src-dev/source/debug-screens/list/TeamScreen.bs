@@ -88,7 +88,7 @@ namespace ml.sample
       m.list@.setContent(content)
       m.list.delegate = m.top
       timer.log("set content")
-      if m.list.state = "rendered"
+      if m.list.state = sample.list.ViewState.rendered
         m.onListRenderState("rendered")
         m.loadingIndicator.isActive = false
       else

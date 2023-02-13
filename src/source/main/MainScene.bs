@@ -119,7 +119,7 @@ namespace mc.sample
 
     private function startLaunchSequence()
       m.log.info("starting launch sequence")
-      m.launchSequence = m.createTask("mc_LaunchSequence", invalid, m.onLaunchSequenceResult)
+      m.launchSequence = m.createTask("LaunchSequence", invalid, m.onLaunchSequenceResult)
     end function
 
     private function onLaunchSequenceResult(result as mc.Result)
@@ -134,15 +134,20 @@ namespace mc.sample
 
     private function showInitialScreen()
       m.log.info("show initial screen")
-      m.developerScreen = mc.createSGNode("DeveloperScreen", m.top, "developerScreen")
-      if m.developerScreen <> invalid
-        m.log.warn("Launching in dev mode!")
-        m.observeNodeField(m.developerScreen, "state", m.onDeveloperScreenState)
-        m.loadingIndicator.isActive = false
-        m.top.appendChild(m.developerScreen)
-        mv.setFocus(m.developerScreen)
-      else
+      if mioc.getInstance("debugFlags", "developerScreen.skipDeveloperScreen") = true
+        m.log.info("Developer screen is disabled with skipDeveloperScreen flag")
         m.showAppController()
+      else
+        m.developerScreen = mc.createSGNode("DeveloperScreen", m.top, "developerScreen")
+        if m.developerScreen <> invalid
+          m.log.warn("Launching in dev mode!")
+          m.observeNodeField(m.developerScreen, "state", m.onDeveloperScreenState)
+          m.loadingIndicator.isActive = false
+          m.top.appendChild(m.developerScreen)
+          mv.setFocus(m.developerScreen)
+        else
+          m.showAppController()
+        end if
       end if
     end function
 

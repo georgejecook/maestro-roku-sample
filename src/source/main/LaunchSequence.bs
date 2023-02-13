@@ -1,0 +1,34 @@
+import "pkg:/source/roku_modules/maestro/core/app/LaunchSequence.brs"
+import "pkg:/source/lib/Errors.bs"
+
+
+namespace sample.app
+  @node("LaunchSequence", "Group")
+  class LaunchSequence extends mc.app.LaunchSequence
+
+    'change this value if you have a different styles location
+    protected styleUrl = "pkg:/meta/Styles.json"
+    public isIncludingView = true
+
+    protected override function getCustomSteps()
+      return [
+        new mc.Command("Load debug flags", m.loadDebugFlags)
+      ]
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function loadDebugFlags(command as mc.Command)
+      debugFlags = m.loadJson("pkg:/meta/DebugFlags.json")
+      if debugFlags = invalid
+        throw errors.debugFlagsNotFound()
+      end if
+      mioc.setInstance("debugFlags", debugFlags)
+      m.finishCommand(command)
+    end function
+
+  end class
+end namespace

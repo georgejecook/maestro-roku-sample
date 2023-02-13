@@ -3,8 +3,9 @@ import "pkg:/source/roku_modules/maestro/core/Utils.brs"
 import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
 import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
 
-@node("FocusOnGridItemScreen", "mv_BaseScreen")
-class FocusOnGridItemScreen extends mv.BaseScreen
+
+@node("SuperFastScrollScreen", "mv_BaseScreen")
+class SuperFastScrollScreen extends mv.BaseScreen
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ Views
@@ -22,14 +23,14 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   private focusSettings
   private cellSettings
   private loadingIndicator
-  private scrollSpeed = 2
+  private scrollSpeed = 0.1
   private numberOfRows = 20
   private defaultCellType = "ml_SimpleCell"
 
   private firstItem = invalid
   private dataIndex = 0
   private selectedRow as mc.types.node
-  private selectedRowIndex as integer
+  private selectedevent as ml.ListEvent
   private selectedItemIndex as integer
   private selectedItem as mc.types.node
 
@@ -43,14 +44,13 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   function new()
-    super("FocusOnGridItemScreen")
+    super("SuperFastScrollScreen")
   end function
 
   protected override function initialize()
     super.initialize()
-    bundle = m.styleManager@.loadBundle("pkg:/source/debug-screens/list/FocusOnGridItemScreen.json")
+    bundle = m.styleManager@.loadBundle("pkg:/source/debug-screens/list/BaseListScreen.json")
     m.createViewsFromStyleJson(bundle.views)
-    m.resetData()
     m.label = m.createSGNode("mv_Label", m.top, "label", {
       translation: [500, 0]
       size: [1000, 50]
@@ -58,11 +58,6 @@ class FocusOnGridItemScreen extends mv.BaseScreen
       color: "#ffffff"
     })
   end function
-
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ Callbacks
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ List Data - Initialization
@@ -75,7 +70,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   end function
 
   private function makeListData()
-    m.list@.setContent(invalid)
+    m.list.content = invalid
 
     timer = new mc.utils.DebugTimer("list")
 
@@ -90,26 +85,54 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     listSettings.numberItemsToRenderAfter = 2
     listSettings.numberItemsToRenderBefore = 1
 
-    content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
-    content@.setNotificationsEnabled(false)
 
+    content = ml.listMixin.createListContent(m.focusSettings, m.rowSettings, listSettings)
     content@.appendChild(m.createHeaderOnlyData())
-    m.liveRow = m.createRow("live", 20, [100, 350])
+    m.liveRow = m.createRow("live", 20)
     m.upcomingRow = m.createRow("upcoming", 20)
     content@.appendChild(m.liveRow)
-    content@.appendChild(m.addRow())
-    content@.appendChild(m.addRow())
-    content@.appendChild(m.addRow())
-    content@.appendChild(m.addRow())
-    content@.appendChild(m.addRow())
+    m.removeNonHeaderRows(true)
+    m.isLoading = not m.isLoading
+
+    m.rows = [
+      m.liveRow
+      m.upcomingRow
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+      m.createRow("complete", 20)
+      m.addRow()
+    ]
+
+    m.list.content@.appendChildren(m.rows, 1)
+
     content@.appendChild(m.upcomingRow)
     timer.log("makeData")
     m.setFocus(m.loadingIndicator)
 
-    m.list@.setContent(content)
+    m.list.content = content
 
     timer.log("set content")
-    if m.list.state = "rendered"
+    if m.list.state = sample.list.ViewState.rendered
       m.onListRenderState("rendered")
       m.loadingIndicator.isActive = false
     else
@@ -118,7 +141,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   end function
 
 
-  private function addRow()
+  protected function addRow()
     rowFocusSettings = ml.listMixin.createFocusSettings("fixed", [0, 0, 0, 0])
     row = createObject("roSGNode", "ml_RowContent")
     rowFocusSettings.feedbackColor = "#F4D42A"
@@ -138,7 +161,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   private liveRow as mc.types.node
   private upcomingRow as mc.types.node
 
-  private function onListRenderState(state as string)
+  protected function onListRenderState(state as string)
     m.log.info("onListRenderState", state)
     if state = "rendered"
       m.setFocus(m.list)
@@ -155,7 +178,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   end function
 
 
-  private function createRow(title as string, numItems as integer, contentOffset = [100, 30] as mc.types.array)
+  protected function createRow(title as string, numItems as integer)
     numCols = 4
     row = createObject("roSGNode", "ml_RowContent")
     row.id = rnd(2147483647).toStr()
@@ -166,18 +189,18 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     row.firstRowScreenPos = 70
     row.otherRowScreenPos = 70
 
-    row.settings.contentOffset = contentOffset
+    row.settings.contentOffset = [100, 30]
     row.title = title
     row@.appendChildren(m.makeItems(m.defaultCellType, numItems, ""))
     return row
   end function
 
-  private function addItems(cellType as string, number as integer)
+  protected function addItems(cellType as string, number as integer)
     row = m.list.content@.getChild(m.list.focusedRowIndex)
     row@.appendChildren(m.makeItems(cellType, number))
   end function
 
-  private function makeItems(cellType as string, number as integer, prefix = "Item" as string)
+  protected function makeItems(cellType as string, number as integer, prefix = "Item" as string)
     items = []
     for i = 0 to number - 1
       items.push(m.makeItem(cellType, `${prefix} ${m.contentId} [${i}]`))
@@ -185,7 +208,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     return items
   end function
 
-  private function makeItem(cellType as string, title as string) as mc.types.node
+  protected function makeItem(cellType as string, title as string) as mc.types.node
     id = str(m.contentId).trim()
     child = m.createSGNode("Item", invalid, id, {
       title: title
@@ -223,6 +246,7 @@ class FocusOnGridItemScreen extends mv.BaseScreen
     m.list.content@.setNotificationsEnabled(false)
     m.list.content@.clear()
     m.list.content@.appendChild(header)
+
     if update
       m.list.content@.notifyUpdate()
     end if
@@ -233,12 +257,10 @@ class FocusOnGridItemScreen extends mv.BaseScreen
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   private function onItemSelected(event as ml.ListEvent)
-    m.selectedRowIndex = event.rowIndex
     m.selectedRow = m.rows[event.rowIndex]
     m.selectedItem = m.selectedRow.getChild(event.cellIndex)
     m.selectedItemIndex = event.cellIndex
     m.log.info("selected item ", mc.dv(m.selectedItem), "from row", mc.dv(m.selectedRow))
-
   end function
 
   private function onRowDidGainFocus(event as ml.ListEvent)
@@ -266,10 +288,10 @@ class FocusOnGridItemScreen extends mv.BaseScreen
 
   private function onRowData(event as ml.ListEvent)
     if event.data.action = "add"
-      ? " add row"
+      ' ? " add row"
       m.liveRow@.appendChildren(m.makeItems(m.defaultCellType, 1, ""))
     else
-      ? " remove row"
+      ' ? " remove row"
       m.liveRow@.removeChildIndex(0)
     end if
 
@@ -285,37 +307,23 @@ class FocusOnGridItemScreen extends mv.BaseScreen
 
   private isRemoved = false
   private isLoading = false
-  private function onKeyPressOptions() as boolean
-    ' ? " REMOVING OTHER ROWS"
-    m.removeNonHeaderRows(true)
-    m.isLoading = not m.isLoading
+  private isAtEnd = false
 
-    if not m.isLoading
-      m.rows = [
-        m.liveRow
-        m.upcomingRow
-        m.createRow("complete", 20)
-        m.addRow()
-        m.createRow("complete", 20)
-        m.addRow()
-        m.createRow("complete", 20)
-        m.addRow()
-        m.createRow("complete", 20)
-        m.addRow()
-        m.createRow("complete", 20)
-        m.addRow()
-        m.createRow("complete", 20)
-        m.addRow()
-        m.createRow("complete", 20)
-        m.addRow()
-        m.createRow("complete", 20)
-        m.addRow()
-      ]
+  private function onKeyPressPlay() as boolean
+    isAtEnd = not isAtEnd
+    m.list@.moveToRow(isAtEnd ? 0 : m.list.content.count() - 1, true)
+    return true
+  end function
 
-      ? "ADDING ROWS"
+  private function onKeyPressFastForward() as boolean
+    m.log.info("moving item focus +1 to:", m.list.focusedCellIndex + 1)
+    m.list@.moveToRowItemIndex(m.list.focusedRowIndex, m.list.focusedCellIndex + 1, true)
+    return true
+  end function
 
-      m.list.content@.insertChildren(m.rows, 1)
-    end if
+  private function onKeyPressRewind() as boolean
+    m.log.info("moving item focus -1 to:")
+    m.list@.moveToRowItemIndex(m.list.focusedRowIndex, m.list.focusedCellIndex - 1, true)
     return true
   end function
 

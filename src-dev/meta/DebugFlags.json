@@ -1,0 +1,9 @@
+{
+  "developerScreen": {
+    "skipDeveloperScreen": false
+  },
+  "deeplinking": {
+    "disableInputTask": true
+  },
+  "config": {}
+}

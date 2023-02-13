@@ -137,7 +137,7 @@ namespace sample.view.screens
       m.list@.setContent(content)
       m.list.delegate = m.top
 
-      if m.list.state = "rendered"
+      if m.list.state = sample.list.ViewState.rendered
         m.onListRenderState("rendered")
         m.loadingIndicator.isActive = false
       else
