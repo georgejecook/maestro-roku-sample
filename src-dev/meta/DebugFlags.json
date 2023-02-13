@@ -5,5 +5,29 @@
   "deeplinking": {
     "disableInputTask": true
   },
-  "config": {}
+  "config": {},
+  "logging": {
+    "includeFilters": {
+      "mv_TabController": true
+    },
+    "excludeFilters": {
+      "__ml_FocusIndicatorManager": true,
+      "FocusIndicatorManager": true,
+      "ml_List": true,
+      "ml_BaseRow": true,
+      "ml_BaseCell": true,
+      "ml_RowHeader": true,
+      "ml_GridRow": true,
+      "ml_HorizontalRow": true,
+      "ItemViewManager": true,
+      "ListItemViewManager": true,
+      "RowItemViewManager": true,
+      "GridRowItemViewManager": true,
+      "ItemScroller": true,
+      "RowItemScroller": true,
+      "GridItemScroller": true,
+      "ListItemScroller": true,
+      "ItemFocusManager": true
+    }
+  }
 }

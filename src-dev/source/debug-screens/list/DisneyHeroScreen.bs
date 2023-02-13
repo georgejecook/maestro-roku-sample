@@ -87,7 +87,7 @@ class DisneyHeroScreen extends mv.BaseScreen
     m.list@.setContent(content)
     timer.log("set content")
     if m.list.state = sample.list.ViewState.rendered
-      m.onListRenderState("rendered")
+      m.onListRenderState(sample.list.ViewState.rendered)
       m.loadingIndicator.isActive = false
     else
       m.observeNodeField(m.list, "state", m.onListRenderState, "value", true)
@@ -293,7 +293,7 @@ class DisneyHeroScreen extends mv.BaseScreen
     m.list.content = content
     timer.log("set content")
     if m.list.state = sample.list.ViewState.rendered
-      m.onListRenderState("rendered")
+      m.onListRenderState(sample.list.ViewState.rendered)
       m.loadingIndicator.isActive = false
     else
       m.observeNodeField(m.list, "state", m.onListRenderState, "value", true)
