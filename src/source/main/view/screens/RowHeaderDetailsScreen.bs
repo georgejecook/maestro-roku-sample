@@ -95,17 +95,13 @@ namespace sample.screens
       content@.appendChildren(m.makeRows())
 
       m.list@.setContent(content)
-
-      row = m.list@.getRowRenderer(0)
-      row@.setItem(asAA(m.originSelection.currentItem))
-
       m.list.delegate = m.top
 
       if m.list.state = sample.list.ViewState.rendered
         m.onListRenderState(sample.list.ViewState.rendered)
         m.loadingIndicator.isActive = false
       else
-        m.observeNodeField(m.list, "state", m.onListRenderState, "value", true)
+        m.observe(m.list.state, m.onListRenderState, "value", true)
       end if
     end function
 
@@ -172,7 +168,9 @@ namespace sample.screens
 
     private function onListRenderState(state as string)
       m.log.info("onListRenderState", state)
-      if state = "rendered"
+      if state = sample.list.ViewState.rendered
+        row = m.list@.getRowRenderer(0)
+        row@.setItem(asAA(m.originSelection.currentItem))
         m.loadingIndicator.isActive = false
       end if
     end function
