@@ -1,0 +1,50 @@
+{
+  "extends": "bsconfig.json",
+  "files": [
+    "manifest",
+    "source/**/*.*",
+    "meta/**/*.*",
+    "components/**/*.*",
+    "!**/images/**/*.*",
+    { "src": "../src-dev/source/**/*.*", "dest": "source" },
+    "!**/*.spec.bs",
+    "**/BaseTest*.spec.bs",
+    "**/START",
+    "**/END"
+  ],
+
+  "plugins": ["roku-log-bsc-plugin", "maestro-roku-bsc-plugin", "rooibos-roku"],
+  "rooibos": {
+    "isRecordingCodeCoverage": false,
+    "testsFilePattern": null,
+    "tags": ["!integration", "!deprecated", "!fixme", "!tbd"],
+    "showOnlyFailures": true,
+    "catchCrashes": false,
+    "lineWidth": 70,
+    "sendHomeOnFinish": false,
+    "failFast": false,
+    "enableAdvancedExpectSyntax": true
+  },
+  "maestro": {
+    "excludeFilters": [
+      "**/RALETrackerTask.*",
+      "**/roku_modules/**/*",
+      "**/node_modules/**/*",
+      "**/rooibos/**/*"
+    ],
+    "nodeClasses": {
+      "buildForIDE": false,
+      "generateTestUtils": true
+    },
+    "extraValidation": {
+      "doExtraValidation": false,
+      "excludeFilters": [],
+      "doExtraImportValidation": false
+    }
+  },
+  "rokuLog": {
+    "strip": false,
+    "insertPkgPath": true
+  },
+  "sourceMap": true
+}

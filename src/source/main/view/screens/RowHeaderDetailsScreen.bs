@@ -1,0 +1,218 @@
+import "pkg:/source/roku_modules/maestro/view/BaseScreen.brs"
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/roku_modules/maestro/view/Animation.brs"
+import "pkg:/source/roku_modules/maestro/ml/ListMixin.brs"
+import "pkg:/source/roku_modules/maestro/core/DebugTimer.brs"
+
+namespace sample.screens
+  @node("RowHeaderDetailsScreen", "mv_BaseScreen")
+  class RowHeaderDetailsScreen extends mv.BaseScreen
+
+    private bgRect as mc.types.node
+    private loadingIndicator as mc.types.node
+    private list as mc.types.node
+
+    private rowSettings as mc.types.node
+
+    private isFavorite = false
+
+    @inject("appController")
+    private appController
+
+    private selectedButton as mc.types.node
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function new()
+      super("RowHeaderDetailsScreen")
+    end function
+
+    protected override function initialize()
+      m.log.info("Initialized RowHeaderDetailsScreen")
+      super.initialize()
+
+      m.createViews()
+
+      if asNode(m.originSelection.initialItem) <> invalid
+        m.setListContent()
+      end if
+    end function
+
+    private function createViews()
+      m.bgRect = m.createSGNode("mv_Rectangle", m.top, "bgRect", {
+        translation: [0, 0]
+        size: [1920, 1080]
+        color: "#bebebe"
+      })
+
+      listHolder = m.createSGNode("Group", m.top, "listHolder")
+      m.list = m.createSGNode("ml_List", listHolder, "list", {
+        translation: [0, 0]
+        width: 1920
+        height: 1080
+      })
+      m.loadingIndicator = m.createSGNode("LoadingIndicator", m.top, "loadingIndicator", {
+        isActive: true
+        width: 1920
+        height: 1080
+        backgroundVisible: false
+      })
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function setListContent()
+      m.log.info("setting list content")
+
+      m.list@.setContent(invalid)
+
+      cellSettings = ml.listMixin.createCellSettings("CustomSimpleCell", [560, 250], 5)
+
+      focusSettings = ml.listMixin.createFocusSettings("fixed")
+      focusSettings.feedbackStyle = "none"
+
+      headerSettings = ml.listMixin.createHeaderSettings([90, 30], 80, "mediumBold,30", "#000000")
+      m.rowSettings = ml.listMixin.createRowSettings(cellSettings, focusSettings, 10, headerSettings, -1, "ml_HorizontalRow", 250)
+      m.rowSettings.numberItemsToRenderBefore = 10
+      m.rowSettings.numberItemsToRenderAfter = 10
+      m.rowSettings.screenPos = 300
+      m.rowSettings.contentOffset = [90, 200]
+
+      listSettings = m.createListSettings()
+      content = ml.listMixin.createListContent(focusSettings, m.rowSettings, listSettings)
+
+      timer = new mc.utils.DebugTimer("list")
+      timer.log("makeRows")
+
+      m.setFocus(m.loadingIndicator)
+
+      content@.setNotificationsEnabled(false)
+      content@.appendChildren(m.makeRows())
+
+      m.list@.setContent(content)
+      m.list.delegate = m.top
+
+      if m.list.state = sample.list.ViewState.rendered
+        m.onListRenderState(sample.list.ViewState.rendered)
+        m.loadingIndicator.isActive = false
+      else
+        m.observe(m.list.state, m.onListRenderState, "value", true)
+      end if
+    end function
+
+    private function makeRows()
+      return [m.makeDetailsHeaderRow(), m.makeRelatedRow()]
+    end function
+
+    private function makeRelatedRow()
+      row = createObject("roSGNode", "ml_RowContent")
+      row.settings = m.rowSettings
+      row.id = rnd(2147483647).toStr()
+      numItems = 20
+      row.title = "Related"
+      row@.appendChildren(m.makeItems(numItems))
+      return row
+    end function
+
+    private function makeDetailsHeaderRow()
+      row = createObject("roSGNode", "ml_RowContent")
+      row.id = rnd(2147483647).toStr()
+      row.settings = ml.listMixin.createCustomRowSettings("DetailsHeaderRow", 500)
+      row.settings.headerSettings.position = "none"
+      row.title = ""
+      return row
+    end function
+
+    private function createListSettings()
+      listSettings = ml.listMixin.createListSettings()
+      listSettings.rowCreationStrategy = "async"
+      listSettings.rowCreationBatchSize = 10
+      listSettings.rowCreationBatchDelay = 0.3
+      listSettings.numberItemsToRenderAfter = 10
+      listSettings.numberItemsToRenderBefore = 10
+      listSettings.renderStrategy = "dynamic"
+      return listSettings
+    end function
+
+    private function makeItems(number as integer, size = [560, 250] as mc.types.array)
+      items = []
+      for i = 0 to number - 1
+        items.push(m.makeItem(`Item ${i}`, size))
+      end for
+      return items
+    end function
+
+    private function makeItem(title as string, size = [560, 250] as mc.types.array) as mc.types.node
+      id = rnd(2147483647).toStr()
+      child = m.createSGNode("Item", invalid, id, {
+        json: {
+          title: title
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquam lorem id ante feugiat fermentum. Proin mi erat, pretium at ante at, condimentum porta lacus. Proin hendrerit tincidunt risus blandit gravida. Duis imperdiet, nulla ut maximus viverra, magna nulla tristique diam, eget rhoncus eros sem quis magna. Quisque viverra ultricies sem ac dictum. Cras sit amet lectus eros. Duis lobortis ligula ac sapien pharetra imperdiet. Vestibulum dictum urna quis orci fermentum ultricies ac in orci."
+          posterUrl: "https://picsum.photos" + `/${size[0]}/${size[1]}`
+
+        }
+      })
+      child.HDGRIDPOSTERURL = "https://picsum.photos" + `/${size[0]}/${size[1]}`
+      return child
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Callbacks
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onListRenderState(state as string)
+      m.log.info("onListRenderState", state)
+      if state = sample.list.ViewState.rendered
+        row = m.list@.getRowRenderer(0)
+        row@.setItem(asAA(m.originSelection.currentItem))
+        m.loadingIndicator.isActive = false
+      end if
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ List Delegate
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function onItemSelected(event as ml.ListEvent)
+      m.log.info("onItemSelected", event.rowIndex, event.cellIndex)
+
+      item = m.list@.getItem(event.rowIndex, event.cellIndex)
+
+      m.log.info("Selected Item", mc.dv(item))
+      selection = m.createSelection(item, "display", {}, "RowHeaderDetailsScreen")
+
+      m.executeSelection(selection)
+    end function
+
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Lifecycle Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function onShow()
+      super.onShow()
+      m.appController@.setMenuVisible(false)
+      m.log.info("showing details screen for item", mc.dv(asNode(m.originSelection.initialItem)))
+      m.setFocus(m.list)
+    end function
+
+    protected override function onFirstShow()
+      super.onFirstShow()
+      m.log.info("first show of details screen for item", mc.dv(asNode(m.originSelection.initialItem)))
+    end function
+
+
+    protected override function onHide()
+      m.log.info("On hide")
+      super.onHide()
+    end function
+
+  end class
+end namespace

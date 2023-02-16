@@ -1,0 +1,35 @@
+{
+  "extends": "bsconfig.json",
+  "files": [
+    "!**/*.i8n.json",
+    "manifest",
+    "source/**/*.*",
+    "images/**/*.*",
+    "sounds/**/*.*",
+    "fonts/**/*.*",
+    "components/**/*.*",
+    "meta/**/*.*",
+    { "src": "../src-prod/meta/**/*.*", "dest": "meta" },
+    { "src": "../src-prod/*", "dest": "" },
+
+    "!**/*.spec.bs"
+  ],
+  "plugins": ["roku-log-bsc-plugin", "maestro-roku-bsc-plugin"],
+  "maestro": {
+    "excludeFilters": [
+      "**/RALETrackerTask.*",
+      "**/roku_modules/**/*",
+      "**/rooibos-roku/**/*",
+      "**/rooibos/**/*"
+    ],
+    "buildForIDE": false,
+    "extraValidation": {
+      "doExtraValidation": true,
+      "doExtraImportValidation": true
+    }
+  },
+  "rokuLog": {
+    "strip": true
+  },
+  "_createPackage": true
+}

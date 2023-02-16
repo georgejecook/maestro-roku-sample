@@ -1,0 +1,23 @@
+import "pkg:/source/roku_modules/maestro/core/Error.brs"
+
+namespace errors
+  enum JsonErrors
+    stylesJsonNotFound = 1
+    debugFlagsNotFound = 2
+  end enum
+
+  function stylesJsonNotFound()
+    return mc.createError(
+    errors.JsonErrors.stylesJsonNotFound,
+    "Styles json not found"
+    )
+  end function
+
+  function debugFlagsNotFound()
+    return mc.createError(
+    errors.JsonErrors.debugFlagsNotFound,
+    "Debug flags not found"
+    )
+  end function
+
+end namespace

@@ -1,0 +1,94 @@
+{
+  "id": "sideMenu",
+  "views": [
+    {
+      "id": "bgRect",
+      "_type": "mv_Rectangle",
+      "size": [100, 1080],
+      "translation": [0, 0],
+      "color": "#6699CC",
+      "visible": true,
+      "opacity": 0.6
+    },
+    {
+      "id": "logo",
+      "_type": "mv_Poster",
+      "translation": [0, 50],
+      "loadSync": true,
+      "loadDisplayMode": "scaleToFit",
+      "uri": "pkg:/images/menu/generic-logo.png",
+      "size": [100, 100]
+    },
+    {
+      "id": "menuGroup",
+      "_type": "Group",
+      "translation": [0, 150],
+      "_children": [
+        {
+          "id": "focusIndicator",
+          "_type": "Group",
+          "translation": [50, 200],
+          "visible": false,
+          "_children": [
+            {
+              "_type": "mv_Poster",
+              "uri": "pkg:/images/solid.9.png",
+              "size": [240, 4],
+              "translation": [0, 66],
+              "blendColor": "~colors.general.white"
+            }
+          ]
+        },
+        {
+          "id": "buttonsGroup",
+          "_type": "mv_ControlsGroup",
+          "translation": [20, 200],
+          "layoutMode": "vert",
+          "keyDirection": "vert",
+          "itemSpacings": [50],
+          "_initializeAfterCreatingChildren": true
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "home",
+      "title": "Home",
+      "screen": "HomeScreen"
+    },
+    {
+      "id": "search",
+      "title": "Search",
+      "screen": "SearchScreen"
+    },
+    {
+      "id": "categories",
+      "title": "Categories",
+      "screen": "CategoriesScreen"
+    }
+  ],
+  "styles": {
+    "focusIndicator": {
+      "innerPadding": [0, 0]
+    },
+    "icons": {
+      "default": {
+        "normal": {
+          "blendColor": "~colors.general.white",
+          "size": [42, 42],
+          "translation": [15, 10],
+          "uri": ""
+        },
+        "focused": {
+          "blendColor": "~colors.general.white",
+          "size": [42, 42]
+        },
+        "selected": {
+          "blendColor": "~colors.general.white",
+          "size": [42, 42]
+        }
+      }
+    }
+  }
+}

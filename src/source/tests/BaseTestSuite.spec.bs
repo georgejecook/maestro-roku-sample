@@ -1,0 +1,57 @@
+import "pkg:/source/roku_modules/maestro/core/Utils.brs"
+import "pkg:/source/roku_modules/maestro/core/MIOC.brs"
+import "pkg:/source/rooibos/Utils.bs"
+import "pkg:/source/rooibos/BaseTestSuite.bs"
+
+namespace tests
+  class BaseTestSuite extends rooibos.BaseTestSuite
+    private appController
+
+    protected log
+
+    protected override function setup()
+      'bs:disable-next-line
+      tests.setUpMScope()
+      m.log = new log.Logger(m.name)
+    end function
+
+    protected override function beforeEach()
+      mioc.createContainer()
+      m.appController = { "id": "appController" }
+      mioc.setInstance("appController", m.appController)
+    end function
+
+    protected override function afterEach()
+      mioc.reset()
+      mioc.clearClassInstances()
+      if m.global.__mioc <> invalid
+        m.global.__mioc = invalid
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Helper Methods
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    protected override function createNodeClass(clazz, useClassAsTop = true, nodeTop = new rooibos.utils.MockNode("top"), nodeGlobal = new rooibos.utils.MockNode("top"))
+      'bs:disable-next-line
+      instance = tests_maestro_nodeClassUtils_createNodeClass(clazz, nodeTop, nodeGlobal)
+      if instance <> invalid and useClassAsTop
+        'note - we use the clazz itself as TOP, so that we don't have to write tests that do
+        'thing.top.value, thing.top.value2, etc all over the place
+        instance.append(nodeTop)
+        instance.top = instance
+        instance.__rooibosSkipFields = { "top": true }
+      end if
+      return instance
+    end function
+  end class
+
+  function setUpMScope()
+    log.initializeLogManager(["log_PrintTransport"], 2)
+    m.global.rLog.includeFilters = []
+    m.global.rLog.excludeFilters = []
+
+    m.log = new log.Logger("rooibosScope")
+  end function
+end namespace

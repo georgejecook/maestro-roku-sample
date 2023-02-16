@@ -1,0 +1,67 @@
+{
+  "extends": "bsconfig.json",
+  "files": [
+    "!**/*.i8n.json",
+    "manifest",
+    "source/**/*.*",
+    "images/**/*.*",
+    "sounds/**/*.*",
+    "fonts/**/*.*",
+    "components/**/*.*",
+    "meta/**/*.*",
+    { "src": "../src-dev/meta/**/*.*", "dest": "meta" },
+    { "src": "../src-dev/source/**/*.*", "dest": "source" },
+    { "src": "../src-dev/images/**/*.*", "dest": "images" },
+    { "src": "../src-dev/components/**/*.*", "dest": "components" },
+    "!../src-dev/source/**/*.spec.bs",
+    "!**/*.spec.bs"
+  ],
+  "plugins": ["maestro-roku-bsc-plugin", "roku-log-bsc-plugin"],
+  "diagnosticFilters": [
+    {
+      "src": "**/roku_modules/**/*.*"
+    },
+    {
+      "src": "node_modules/**/*.*"
+    },
+    {
+      "src": "**/maestro/**/*.*"
+    },
+    {
+      "src": "**/RALETrackerTask.*"
+    },
+    {
+      "src": "**/*spec.bs",
+      "codes": ["LINT3011"]
+    },
+    1128
+  ],
+  "maestro": {
+    "excludeFilters": [
+      "**/RALETrackerTask.*",
+      "**/node_modules/**/*",
+      "**/roku_modules/**/*",
+      "**/rooibos/**/*"
+    ],
+    "buildForIDE": false,
+    "extraValidation": {
+      "doExtraValidation": true,
+      "doExtraImportValidation": true,
+      "excludeFilters": []
+    }
+  },
+  "rooibos": {
+    "isRecordingCodeCoverage": false,
+    "testsFilePattern": null
+  },
+  "rokuLog": {
+    "strip": false,
+    "insertPkgPath": true,
+    "removeComments": true
+  },
+  "logLevel": "error",
+  "retainStagingFolder": true,
+  "transpileOptions": {
+    "removeParameterTypes": true
+  }
+}

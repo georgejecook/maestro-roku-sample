@@ -1,0 +1,202 @@
+import "pkg:/source/tests/BaseTestSuite.spec.bs"
+import "pkg:/source/main/view/screens/HomeScreen.bs"
+
+namespace tests
+  @suite("HomeScreen tests")
+  class HomeScreenTests extends tests.BaseTestSuite
+    private screen as mc.types.node
+
+    protected override function beforeEach()
+      super.beforeEach()
+      m.screen = m.createNodeClass(sample.view.screens.HomeScreen)
+      m.screen.loadingIndicator = { "id": "loadingIndicator" }
+      m.screen.list = { "id": "list", state: "rendered" }
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("initialize ")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it creates the views")
+    function _()
+      rectangle = { "id": "rectangle" }
+      listHolder = { "id": "listHolder" }
+      list = { "id": "list" }
+
+      m.screen.list = list
+      m.screen.listHolder = listHolder
+
+      m.expectCalled(m.screen.createSGNode("mv_Rectangle", m.screen.top, "bgRect", {
+        translation: [0, 0]
+        size: [1920, 1080]
+        color: "#bebebe"
+      }), rectangle)
+
+      m.expectCalled(m.screen.createSGNode("Group", m.screen.top, "listHolder"), listHolder)
+      m.expectCalled(m.screen.createSGNode("ml_List", m.screen.listHolder, "list", {
+        translation: [50, 200]
+        width: 1920
+        height: 1080
+      }), list)
+
+      m.expectCalled(m.screen.setInstance("list", m.screen.list))
+
+      m.expectCalled(m.screen.createSGNode("LoadingIndicator", m.screen.top, "loadingIndicator", {
+        isActive: true
+        width: 1920
+        height: 1080
+        backgroundVisible: false
+      }))
+
+      m.expectCalled(m.screen.onResetChange())
+
+      m.screen.initialize()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onResetChange")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("resets content on the list and triggers the callback for list's rendered state")
+    function _()
+      rowSettings = { "id": "rowSettings" }
+      listSettings = { "id": "listSettings" }
+      content = { "id": "content" }
+      rows = [{ "id": "rows" }]
+
+      m.expectCalled(m.screen.list@.setContent(invalid))
+      m.expectCalled(m.screen.createRowSettings(), rowSettings)
+      m.expectCalled(m.screen.createListSettings(), listSettings)
+      m.expectCalled(m.screen.createListContent(listSettings), content)
+
+      m.expectCalled(m.screen.makeRows(), rows)
+      m.expectCalled(m.screen.setFocus(m.screen.loadingIndicator))
+
+      m.expectCalled(content@.setNotificationsEnabled(false))
+      m.expectCalled(content@.appendChildren(rows))
+
+      m.expectCalled(m.screen.list@.setContent(content))
+      m.expectNotCalled(m.screen.observe)
+      m.expectCalled(m.screen.onListRenderState("rendered"))
+
+      m.screen.onResetChange()
+      m.assertFalse(m.screen.loadingIndicator.isActive)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("makeRows")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("creates content rows")
+    function _()
+      rowSettings = { "id": "rowSettings" }
+      heroRow = { "id": "heroRow" }
+      row = { "id": "row" }
+
+      numItems = 20
+
+      m.screen.numberOfRows = 1
+      m.screen.rowSettings = rowSettings
+
+      m.expectCalled(m.screen.makeHeroRow(), heroRow)
+      m.expectCalled(m.screen.createSGNode("ml_RowContent"), row)
+      m.expectCalled(m.screen.makeItems(numItems), [])
+      m.expectCalled(row@.appendChildren([]))
+
+      content = m.screen.makeRows()
+
+      m.assertEqual(content.count(), 2)
+      m.assertEqual(row.settings, rowSettings)
+      m.assertEqual(row.title, "Row 0")
+
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onShow")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it gets triggered when the screen is shown")
+    function _()
+      m.expectCalled(m.screen.appController@.setMenuVisible(true))
+
+      m.screen.onShow()
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onGainedFocus")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("doesn't do anything if it's not self focused")
+    function _()
+      m.expectNotCalled(m.screen.setFocus)
+
+      m.screen.onGainedFocus(false)
+    end function
+
+    @it("sets focus on the list")
+    function _()
+      m.expectCalled(m.screen.setFocus(m.screen.list))
+
+      m.screen.onGainedFocus(true)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onItemSelected")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("it gets triggered when an item is selected")
+    @params(0, 1, "DetailsScreen")
+    @params(2, 2, "DetailsScreen")
+    @params(1, 3, "RowHeaderDetailsScreen")
+
+    function _(rowIndex, cellIndex, screen)
+      item = { "id": "item" }
+      event = { "rowIndex": rowIndex, "cellIndex": cellIndex }
+      selection = { "id": "selection" }
+
+      m.expectCalled(m.screen.list@.getItem(event.rowIndex, event.cellIndex), item)
+      m.expectCalled(m.screen.createSelection(item, "display", {}, screen), selection)
+      m.expectCalled(m.screen.executeSelection(selection))
+
+      m.screen.onItemSelected(event)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressBack")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false when back key is pressed")
+    function _()
+      m.assertFalse(m.screen.onKeyPressBack())
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressLeft")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false when left key is pressed and app uses side menu, true otherwise")
+    @params(true, false)
+    @params(false, true)
+    function _(useSideMenu, expected)
+      appController = { "id": "appController", "useSideMenu": useSideMenu }
+      m.screen.appController = appController
+
+      m.assertEqual(m.screen.onKeyPressLeft(), expected)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @describe("onKeyPressRight")
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    @it("returns false when right key is pressed and app uses side menu, true otherwise")
+    @params(true, false)
+    @params(false, true)
+    function _(useSideMenu, expected)
+      appController = { "id": "appController", "useSideMenu": useSideMenu }
+      m.screen.appController = appController
+
+      m.assertEqual(m.screen.onKeyPressRight(), expected)
+    end function
+
+  end class
+end namespace

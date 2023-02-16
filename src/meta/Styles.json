@@ -1,0 +1,228 @@
+{
+  "version": "0.0.1",
+  "colors": {
+    "background": {
+      "normal": "#000000",
+      "light": "#aaaaaa",
+      "dark": "#111111",
+      "red": "#AC4731",
+      "darkPurple": "#662D91"
+    },
+    "general": {
+      "red": "#ff0000",
+      "ligh-red": "#aa0000",
+      "blue": "#0000ff",
+      "light-blue": "#0000aa",
+      "black": "#000000",
+      "dark": "#555555",
+      "white": "#ffffff",
+      "green": "#00ff00",
+      "grey": "#aaaaaa"
+    }
+  },
+  "fonts": {
+    "title-00": "mediumBold,14",
+    "title-01": "mediumBold,16",
+    "title-02": "mediumBold,20",
+    "title-03": "mediumBold,24",
+    "title-04": "mediumBold,28",
+    "title-05": "mediumBold,32",
+    "title-06": "mediumBold,40",
+    "title-07": "mediumBold,48",
+    "caption": "medium,12",
+    "body-00": "medium,14",
+    "body-01": "medium,16",
+    "body-02": "medium,20",
+    "body-03": "medium,24",
+    "body-04": "medium,27",
+    "body-05": "medium,32",
+    "body-06": "medium,40"
+  },
+  "icons": {
+    "play": {
+      "uri": "pkg:/images/play-icon-$$RES$$.png",
+      "size": [50, 50]
+    },
+    "favorite": {
+      "uri": "pkg:/images/fav-icon.png",
+      "size": [50, 50],
+      "blendColor": "#000000"
+    }
+  },
+  "buttons": {
+    "general": {
+      "size": [0, 0],
+      "textOffset": [0, -1],
+      "iconOffset": [-1, -1],
+      "normal": {
+        "label": {
+          "fontKey": "~fonts.body-04",
+          "color": "~colors.general.black",
+          "translation": [0, 15],
+          "size": [300, 60],
+          "vertAlign": "center"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.body-04",
+          "color": "~colors.general.black",
+          "translation": [30, 40],
+          "size": [0, 20],
+          "vertAlign": "top",
+          "horizAlign": "left"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#ffffff"
+        },
+        "iconPoster": {
+          "blendColor": "#ffffff",
+          "size": [0, 0],
+          "translation": [0, 0]
+        }
+      },
+      "focused": {
+        "label": {
+          "size": [300, 60],
+          "fontKey": "~fonts.title-04",
+          "color": "#ffffff"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#6699CC"
+        }
+      },
+      "disabled": {
+        "label": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.grey",
+          "translation": [0, 0],
+          "size": [0, 60],
+          "horizAlign": "left",
+          "vertAlign": "center"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.grey",
+          "translation": [0, 40],
+          "size": [0, 20],
+          "vertAlign": "top",
+          "horizAlign": "left"
+        },
+        "backgroundPoster": {
+          "uri": ""
+        },
+        "iconPoster": {
+          "blendColor": "#aaaaaa"
+        }
+      },
+      "selected": {
+        "label": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#6699CC"
+        },
+        "iconPoster": {
+          "blendColor": "#6699CC"
+        }
+      }
+    },
+    "sideMenu": {
+      "size": [0, 0],
+      "textOffset": [0, -1],
+      "iconOffset": [-1, -1],
+      "normal": {
+        "label": {
+          "fontKey": "~fonts.body-04",
+          "color": "~colors.general.white",
+          "translation": [20, 0],
+          "size": [300, 60],
+          "vertAlign": "center"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.body-04",
+          "color": "~colors.general.black",
+          "translation": [30, 40],
+          "size": [0, 20],
+          "vertAlign": "top",
+          "horizAlign": "left"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#6699CC06"
+        },
+        "iconPoster": {
+          "blendColor": "~colors.general.white",
+          "size": [0, 0],
+          "translation": [0, 0]
+        }
+      },
+      "focused": {
+        "label": {
+          "size": [300, 60],
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.white"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#6699CC"
+        }
+      },
+      "disabled": {
+        "label": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.grey",
+          "translation": [0, 0],
+          "size": [0, 60],
+          "horizAlign": "left",
+          "vertAlign": "center"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.grey",
+          "translation": [0, 40],
+          "size": [0, 20],
+          "vertAlign": "top",
+          "horizAlign": "left"
+        },
+        "backgroundPoster": {
+          "uri": ""
+        },
+        "iconPoster": {
+          "blendColor": "#aaaaaa"
+        }
+      },
+      "selected": {
+        "label": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.white"
+        },
+        "subtextLabel": {
+          "fontKey": "~fonts.title-04",
+          "color": "~colors.general.black"
+        },
+        "backgroundPoster": {
+          "uri": "pkg:/images/backgrounds/background-round-solid-$$RES$$.9.png",
+          "blendColor": "#6699CC"
+        },
+        "iconPoster": {
+          "blendColor": "~colors.general.white"
+        }
+      }
+    }
+  }
+}
