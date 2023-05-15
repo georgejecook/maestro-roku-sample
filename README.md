@@ -1,9 +1,6 @@
-<p align="center">
-  <img src="docs/maestroLogo.png" alt="Maestro for roku" />
-</p>
-<h3 align="center">
-A development platform for building roku channels in brighterscript. <a href="https://github.com/georgejecook/maestro-roku">View library</a>
-</h3>
+# A development platform for building roku channels in brighterscript
+
+[View maestro library](https://github.com/georgejecook/maestro-roku)
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/georgejecook/maestro-roku-sample/build.yml?logo=github&branch=master)](https://github.com/georgejecook/maestro-roku-sample/actions/workflows/build.yml)
 [![GitHub](https://img.shields.io/github/release/georgejecook/maestro-roku-sample.svg?style=flat-square)](https://github.com/georgejecook/maestro-roku-sample/releases)
