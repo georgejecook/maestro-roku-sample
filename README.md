@@ -19,7 +19,7 @@ A development platform for building roku channels in brighterscript. View librar
  - Clone this repo
  - Copy sample.env file in .vscode folder, replace your roku device ip and password and rename file to .env
  - `npm install`
- - `npm run build-sample-app`
+ - `npm run build-dev` or if you're using VSCode hit `F5` to run the `DEV` launch config (to use the GUI hit the "play" button in the top left on the `Run and Debug` tab)
 
 ## Working on parts of maestro
  - `npm install`
