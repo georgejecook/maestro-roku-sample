@@ -8,12 +8,12 @@
     "maestro": "npm:maestro-roku@^0.57.0"
   },
   "devDependencies": {
+    "@rokucommunity/bslib": "0.1.1",
     "@rokucommunity/bslint": "0.8.1",
     "@types/fs-extra": "^9.0.13",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "brighterscript": "0.61.3",
-    "bslib": "1.0.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-github": "^4.6.1",
