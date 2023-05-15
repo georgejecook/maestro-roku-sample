@@ -5,8 +5,7 @@
 A development platform for building roku channels in brighterscript. View library
 </h3>
 
-
-[![Build Status](https://travis-ci.org/georgejecook/maestro-roku-sample.svg?branch=master)](https://travis-ci.org/georgejecook/maestro)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/georgejecook/maestro-roku-sample/build.yml?logo=github&branch=master)](https://github.com/georgejecook/maestro-roku-sample/actions/workflows/build.yml)
 [![GitHub](https://img.shields.io/github/release/georgejecook/maestro-roku-sample.svg?style=flat-square)](https://github.com/georgejecook/maestro-roku-sample/releases)
 
 ## Links
