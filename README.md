@@ -10,7 +10,7 @@ A development platform for building roku channels in brighterscript. View librar
 [![GitHub](https://img.shields.io/github/release/georgejecook/maestro-roku-sample.svg?style=flat-square)](https://github.com/georgejecook/maestro-roku-sample/releases)
 
 ## Links
- - **[Documentation]([docs/index.md](https://github.com/georgejecook/maestro-roku/blob/master/docs/index.md))**
+ - **[Documentation](https://github.com/georgejecook/maestro-roku/blob/master/docs/index.md)**
  - **[API docs](https://github.com/georgejecook/maestro-roku/blob/master/docs/API-Docs.md)**
  - \#maestro channel on the [roku developer's slack](https://join.slack.com/t/rokudevelopers/shared_invite/enQtMzgyODg0ODY0NDM5LTc2ZDdhZWI2MDBmYjcwYTk5MmE1MTYwMTA2NGVjZmJiNWM4ZWY2MjY1MDY0MmViNmQ1ZWRmMWUzYTVhNzJiY2M)
 
