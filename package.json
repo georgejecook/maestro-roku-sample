@@ -4,16 +4,16 @@
   "description": "A development platform for building roku channels in brighterscript. Sample app",
   "main": "index.js",
   "dependencies": {
-    "log": "npm:roku-log@^0.9.3",
-    "maestro": "npm:maestro-roku@^0.57.0"
+    "@rokucommunity/bslib": "^0.1.1",
+    "log": "npm:roku-log@^0.10.1",
+    "maestro": "npm:maestro-roku@0.69.0"
   },
   "devDependencies": {
     "@rokucommunity/bslint": "0.8.1",
     "@types/fs-extra": "^9.0.13",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
-    "brighterscript": "0.61.3",
-    "bslib": "1.0.0",
+    "brighterscript": "^0.64.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-github": "^4.6.1",
@@ -21,16 +21,16 @@
     "eslint-plugin-no-only-tests": "^2.6.0",
     "find-in-files": "^0.5.0",
     "fs-extra": "^10.1.0",
-    "maestro-roku-bsc-plugin": "^0.27.0",
+    "maestro-roku-bsc-plugin": "0.29.1",
     "path": "^0.12.7",
-    "roku-deploy": "3.7.0",
-    "roku-log-bsc-plugin": "0.7.0",
-    "rooibos-roku": "5.4.2",
+    "roku-deploy": "^3.10.3",
+    "roku-log-bsc-plugin": "^0.8.1",
+    "rooibos-roku": "5.5.3",
     "ropm": "0.10.5",
     "scenegraph-schema": "^0.2.1",
     "telnet-client": "1.4.11",
     "ts-node": "^10.4.0",
-    "typescript": "4.2.4",
+    "typescript": "^4.9.5",
     "util": "^0.12.5"
   },
   "repository": {
@@ -67,7 +67,7 @@
   "scripts": {
     "postinstall": "npm run build-scripts && npm run ropm",
     "update-schema": "npm run build && cd build && npx scenegraph-schema -o ../.vscode/project.xsd",
-    "ropm": "ropm copy",
+    "ropm": "ropm copy && node scripts/maestro-ropm-hook.js",
     "build": "node scripts/run prod",
     "build-scripts": "rm -rf build-scripts && npx tsc",
     "build-dev": "node scripts/run.js dev",
