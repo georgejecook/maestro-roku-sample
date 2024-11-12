@@ -1,0 +1,43 @@
+import "pkg:/source/lib/BaseTask.bs"
+
+namespace $NAMESPACE$
+  @task("$CLASSNAME$", "Task")
+  class $CLASSNAME$ extends gs.lib.BaseTask
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Private Fields
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Initialization
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function new()
+      super("$CLASSNAME$")
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Entry point
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function execute(args as mc.types.assocarray) as dynamic
+      m.log.info("executing task with args", args)
+
+      command = asString(args.command)
+
+      if command = "exampleCommand"
+        return m.exampleCommand(asString(args.id))
+      else
+        throw mc.createError("unknown command", `unknown command: ${command}`)
+      end if
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ Command Handlers
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    private function exampleCommand(id as string) as boolean
+      throw mc.createError("Not Implemented", "$CLASSNAME$ it not yet implemented")
+    end function
+  end class
+end namespace
