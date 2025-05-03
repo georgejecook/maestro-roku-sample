@@ -3,6 +3,7 @@ build
 ###BrightScript specific
 dist/apps
 out/
+build-scripts
 
 #Rooibos generated
 rooibosFunctionMap.brs
